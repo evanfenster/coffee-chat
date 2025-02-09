@@ -1153,3 +1153,20 @@ export const LineChartIcon = ({ size = 16 }: { size?: number }) => (
     ></path>
   </svg>
 );
+
+export const CoffeeIcon = ({ size = 16 }: { size?: number }) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    viewBox="0 0 16 16"
+    width={size}
+    style={{ color: 'currentcolor' }}
+  >
+    <path
+      fill="currentColor"
+      fillRule="evenodd"
+      d="M4 3.5V3h8v.5c0 .5-.5 1-1 1H5c-.5 0-1-.5-1-1zM3 5h10v5c0 1.657-1.343 3-3 3H6c-1.657 0-3-1.343-3-3V5zm11 1h1v4c0 .552-.448 1-1 1h-.6c.365-.294.6-.737.6-1.236V6zM2.5 14h11a.5.5 0 010 1h-11a.5.5 0 010-1z"
+      clipRule="evenodd"
+    />
+  </svg>
+);

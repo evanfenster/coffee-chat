@@ -1,8 +1,9 @@
 {
-  "name": "ai-chatbot",
+  "name": "coffee-chat",
   "version": "0.1.0",
   "private": true,
   "scripts": {
+
     "dev": "next dev --turbo",
     "build": "tsx lib/db/migrate && next build",
     "start": "next start",

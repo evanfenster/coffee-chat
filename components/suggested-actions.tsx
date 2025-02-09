@@ -16,24 +16,25 @@ interface SuggestedActionsProps {
 function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
-      title: 'What are the advantages',
-      label: 'of using Next.js?',
-      action: 'What are the advantages of using Next.js?',
+      title: 'Recommend a coffee',
+      label: 'like milk chocolate',
+      action: 'Can you recommend a coffee bean based on my preference for smooth, medium roast coffee with chocolate notes?',
+
     },
     {
-      title: 'Write code to',
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
+      title: 'Help me understand',
+      label: 'coffee roast levels',
+      action: 'What are the different coffee roast levels and how do they affect taste?',
     },
     {
-      title: 'Help me write an essay',
-      label: `about silicon valley`,
-      action: `Help me write an essay about silicon valley`,
+      title: 'Find similar beans',
+      label: 'to Ethiopian Yirgacheffe',
+      action: 'I love Ethiopian Yirgacheffe coffee. Can you suggest similar coffee beans I might enjoy?',
     },
     {
-      title: 'What is the weather',
-      label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
+      title: 'Explain coffee terms',
+      label: 'like acidity and body',
+      action: 'Can you explain common coffee tasting terms like acidity, body, and mouthfeel?',
     },
   ];
 

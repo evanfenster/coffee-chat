@@ -91,9 +91,10 @@ export function createDocumentHandler<T extends BlockKind>(config: {
  */
 export const documentHandlersByBlockKind: Array<DocumentHandler> = [
   textDocumentHandler,
-  codeDocumentHandler,
+  //codeDocumentHandler,
   imageDocumentHandler,
   sheetDocumentHandler,
 ];
 
-export const blockKinds = ['text', 'code', 'image', 'sheet'] as const;
+//export const blockKinds = ['text', 'code', 'image', 'sheet'] as const;
+export const blockKinds = ['sheet'] as const;

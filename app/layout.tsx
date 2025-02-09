@@ -6,10 +6,11 @@ import { ThemeProvider } from '@/components/theme-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://chat.vercel.ai'),
-  title: 'Next.js Chatbot Template',
-  description: 'Next.js chatbot template using the AI SDK.',
+  metadataBase: new URL('https://coffee-chat-bay.vercel.app/'),
+  title: 'CoffeeChat',
+  description: 'CoffeeChat is an interactive chatbot that helps you find and purchase new coffee beans.',
 };
+
 
 export const viewport = {
   maximumScale: 1, // Disable auto-zoom on mobile Safari
