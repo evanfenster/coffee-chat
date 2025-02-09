@@ -1,193 +1,210 @@
-'use client';
+"use client"
 
-import cx from 'classnames';
-import Image from 'next/image';
+import Image from "next/image"
+import cx from "classnames"
 
 interface CoffeeProduct {
-  name: string;
-  vendor: string;
-  handle: string;
-  roastLevel?: string;
-  type?: string;
-  tasteType?: string;
-  process?: string;
-  origin?: string;
-  region?: string;
-  certifications?: string[];
-  tastingNotes?: string[];
-  price: string;
-  available: boolean;
-  imageUrl?: string;
+  name: string
+  vendor: string
+  handle: string
+  roastLevel?: string
+  type?: string
+  tasteType?: string
+  process?: string
+  origin?: string
+  region?: string
+  certifications?: string[]
+  tastingNotes?: string[]
+  price: string
+  available: boolean
+  imageUrl?: string
 }
 
 interface CoffeeOptionsResult {
-  totalResults: number;
-  products: CoffeeProduct[];
-  appliedFilters: Record<string, unknown>;
+  totalResults: number
+  products: CoffeeProduct[]
+  appliedFilters: Record<string, unknown>
   availableOptions: {
-    roastLevels: { count: number; options: string[] };
-    tastingNotes: { count: number; options: string[] };
-    regions: { count: number; options: string[] };
-    origins: { count: number; options: string[] };
-    roasters: { count: number; options: string[] };
-    processes: { count: number; options: string[] };
-    certifications: { count: number; options: string[] };
-    tasteTypes: { count: number; options: string[] };
-  };
+    roastLevels: { count: number; options: string[] }
+    tastingNotes: { count: number; options: string[] }
+    regions: { count: number; options: string[] }
+    origins: { count: number; options: string[] }
+    roasters: { count: number; options: string[] }
+    processes: { count: number; options: string[] }
+    certifications: { count: number; options: string[] }
+    tasteTypes: { count: number; options: string[] }
+  }
 }
 
 function formatArrayString(value: string): string {
-  // Remove quotes, brackets, and split by commas
   return value
-    .replace(/[\[\]"]/g, '')
-    .split(',')
-    .map(s => s.trim())
-    .join(', ');
+    .replace(/[[\]"]/g, "")
+    .split(",")
+    .map((s) => s.trim())
+    .join(", ")
 }
 
 export function CoffeeCard({
   result,
   className,
 }: {
-  result: CoffeeOptionsResult;
-  className?: string;
+  result: CoffeeOptionsResult
+  className?: string
 }) {
   if (!result.products || result.products.length === 0) {
-    return (
-      <div className="p-4 text-neutral-600 text-center">
-        No coffee options found with the specified criteria.
-      </div>
-    );
+    return <div className="p-4 text-neutral-600 text-center">No coffee options found with the specified criteria.</div>
   }
 
-  const product = result.products[0];
+  const product = result.products[0]
 
   return (
     <div
       className={cx(
-        'flex flex-row rounded-3xl overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 border border-amber-100 max-w-[800px] shadow-sm',
+        "flex flex-col rounded-3xl overflow-hidden bg-white border border-stone-200 max-w-[800px] shadow-sm",
         className,
       )}
     >
-      {/* Image Section */}
-      <div className="relative w-[400px] h-[500px] bg-neutral-100 shrink-0">
-        {product.imageUrl && (
-          <Image
-            src={product.imageUrl}
-            alt={`${product.name} coffee`}
-            fill
-            className="object-cover"
-            priority
-          />
-        )}
+      <div className="flex flex-col md:flex-row">
+        {/* Image Section - Larger and without background */}
+        <div className="md:w-1/2 flex items-center justify-center">
+          <div className="relative w-full aspect-square max-w-[400px]">
+            {product.imageUrl ? (
+              <Image
+                src={product.imageUrl || "/placeholder.svg"}
+                alt={`${product.name} coffee`}
+                fill
+                className="object-contain transition-transform duration-300 hover:scale-105"
+                priority
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-stone-400">No image available</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="md:w-1/2 p-6 flex flex-col">
+          {/* Vendor */}
+          <div className="text-sm font-medium text-amber-700 mb-4">{product.vendor}</div>
+
+          {/* Title and Type */}
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold text-stone-900">{product.name}</h3>
+            {product.type && <div className="text-base text-stone-600 mt-1">{product.type}</div>}
+          </div>
+
+          {/* Tags Section */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {product.roastLevel && (
+              <span className="px-3 py-1 bg-amber-50 text-amber-900 text-sm font-medium rounded-lg">
+                {product.roastLevel} Roast
+              </span>
+            )}
+            {product.process && (
+              <span className="px-3 py-1 bg-amber-50 text-amber-900 text-sm font-medium rounded-lg">
+                {formatArrayString(product.process)}
+              </span>
+            )}
+            {product.tasteType && (
+              <span className="px-3 py-1 bg-amber-50 text-amber-900 text-sm font-medium rounded-lg">
+                {product.tasteType}
+              </span>
+            )}
+          </div>
+
+          {/* Details Grid */}
+          <div className="grid gap-6 mb-6">
+            {/* Origin & Region */}
+            {(product.origin || product.region) && (
+              <div className="space-y-2">
+                <span className="text-xs font-medium uppercase tracking-wider text-stone-500">Origin</span>
+                <div className="flex flex-wrap gap-2">
+                  {product.origin && (
+                    <span className="px-3 py-1.5 bg-orange-50 text-orange-900 text-sm font-medium rounded-lg border border-orange-100">
+                      {formatArrayString(product.origin)}
+                    </span>
+                  )}
+                  {product.region && (
+                    <span className="px-3 py-1.5 bg-emerald-50 text-emerald-900 text-sm font-medium rounded-lg border border-emerald-100">
+                      {formatArrayString(product.region)}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Tasting Notes */}
+            {product.tastingNotes && product.tastingNotes.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-xs font-medium uppercase tracking-wider text-stone-500">Tasting Notes</span>
+                <div className="flex flex-wrap gap-2">
+                  {product.tastingNotes.map((note) => (
+                    <span
+                      key={note}
+                      className="px-3 py-1.5 bg-amber-50 text-amber-800 text-sm font-medium rounded-lg border border-amber-200"
+                    >
+                      {formatArrayString(note)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Content Section */}
-      <div className="flex flex-col gap-6 p-8 flex-1 bg-[radial-gradient(circle_at_center,rgba(251,146,60,0.05)_1px,transparent_1px)] bg-[length:24px_24px]">
-        {/* Header */}
-        <div className="flex flex-col">
-          <div className="text-sm font-medium text-amber-700 mb-1">{product.vendor}</div>
-          <h3 className="text-3xl font-bold text-amber-950 mb-2">{product.name}</h3>
-          {product.type && (
-            <div className="text-base text-amber-800">{product.type}</div>
-          )}
-        </div>
+      {/* Checkout Section */}
+      <div className="relative mt-auto">
+        {/* Decorative diagonal line */}
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_49.5%,#2c1810_49.5%,#2c1810_50.5%,transparent_50.5%)]" />
 
-        {/* Primary Characteristics */}
-        <div className="grid grid-cols-2 gap-6">
-          {product.roastLevel && (
-            <div className="space-y-1.5">
-              <span className="text-xs font-medium uppercase tracking-wider text-amber-700/70">
-                Roast Level
-              </span>
-              <div className="font-medium text-amber-900 bg-amber-100/50 px-3 py-1.5 rounded-lg inline-block">
-                {product.roastLevel}
+        <div className="px-8 py-6 bg-gradient-to-br from-[#3C2A1E] to-[#2C1810] relative">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col items-start">
+              <div className="text-sm font-medium text-stone-400 tracking-wide uppercase mb-1">Price</div>
+              <div className="relative">
+                <div className="text-4xl font-bold text-white tracking-tight">${Number(product.price).toFixed(2)}</div>
+                <div className="absolute -right-4 -top-3 text-amber-400 text-sm font-medium">USD</div>
               </div>
             </div>
-          )}
-          {product.process && (
-            <div className="space-y-1.5">
-              <span className="text-xs font-medium uppercase tracking-wider text-amber-700/70">
-                Process
-              </span>
-              <div className="font-medium text-amber-900 bg-amber-100/50 px-3 py-1.5 rounded-lg inline-block">
-                {formatArrayString(product.process)}
-              </div>
+
+            <div className="flex items-center gap-4">
+              {!product.available && (
+                <span className="px-4 py-2 bg-red-500/10 text-red-300 text-sm font-medium rounded-full border border-red-300/20 backdrop-blur-sm">
+                  Out of Stock
+                </span>
+              )}
+              <button
+                className={cx(
+                  "group relative px-8 py-3.5 rounded-2xl font-medium text-lg transition-all duration-300",
+                  "before:absolute before:inset-0 before:rounded-2xl before:transition-all before:duration-300",
+                  product.available
+                    ? [
+                        "text-white overflow-hidden",
+                        "before:bg-gradient-to-r before:from-amber-500 before:to-orange-500",
+                        "hover:before:scale-105 hover:before:opacity-90",
+                        "active:before:scale-100 active:before:opacity-100",
+                      ].join(" ")
+                    : ["text-stone-400 bg-stone-800/50", "cursor-not-allowed"].join(" "),
+                )}
+                disabled={!product.available}
+              >
+                <span className="relative">{product.available ? "Add to Cart" : "Sold Out"}</span>
+                {product.available && (
+                  <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+                    <svg className="w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </span>
+                )}
+              </button>
             </div>
-          )}
+          </div>
         </div>
-
-        {/* Origin & Region */}
-        {(product.origin || product.region) && (
-          <div className="space-y-2">
-            <span className="text-xs font-medium uppercase tracking-wider text-amber-700/70">
-              Origin
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {product.origin && (
-                <span className="px-3 py-1.5 bg-amber-100/50 text-amber-900 text-sm font-medium rounded-lg border border-amber-200/50">
-                  {formatArrayString(product.origin)}
-                </span>
-              )}
-              {product.region && (
-                <span className="px-3 py-1.5 bg-emerald-100/50 text-emerald-900 text-sm font-medium rounded-lg border border-emerald-200/50">
-                  {formatArrayString(product.region)}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Taste Profile */}
-        {product.tasteType && (
-          <div className="space-y-2">
-            <span className="text-xs font-medium uppercase tracking-wider text-amber-700/70">
-              Taste Profile
-            </span>
-            <div className="font-medium text-amber-900 bg-rose-100/50 px-3 py-1.5 rounded-lg inline-block border border-rose-200/50">
-              {product.tasteType}
-            </div>
-          </div>
-        )}
-
-        {/* Tasting Notes */}
-        {product.tastingNotes && product.tastingNotes.length > 0 && (
-          <div className="space-y-2">
-            <span className="text-xs font-medium uppercase tracking-wider text-amber-700/70">
-              Tasting Notes
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {product.tastingNotes.map((note) => (
-                <span
-                  key={note}
-                  className="px-3 py-1.5 bg-yellow-100/50 text-yellow-900 text-sm font-medium rounded-lg border border-yellow-200/50"
-                >
-                  {formatArrayString(note)}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Certifications */}
-        {product.certifications && product.certifications.length > 0 && (
-          <div className="space-y-2 mt-auto pt-4 border-t border-amber-200/50">
-            <span className="text-xs font-medium uppercase tracking-wider text-amber-700/70">
-              Certifications
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {product.certifications.map((cert) => (
-                <span
-                  key={cert}
-                  className="px-3 py-1.5 bg-purple-100/50 text-purple-900 text-sm font-medium rounded-lg border border-purple-200/50"
-                >
-                  {formatArrayString(cert)}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
-  );
+  )
 }
+

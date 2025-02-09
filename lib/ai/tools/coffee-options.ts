@@ -86,7 +86,7 @@ const buildGraphQLQuery = (filters?: z.infer<typeof toolParameters>['filters']) 
             }`).join(',') || ''}
           ],
           sortKey: MANUAL,
-          first: 1
+          first: 30
         ) {
           nodes {
             title
