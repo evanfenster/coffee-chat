@@ -20,7 +20,7 @@ export const Overview = () => {
           <MessageIcon size={32} />
         </p>
         <p>
-          Let's find your next favorite coffee.
+          Let&apos;s find your next favorite coffee.
         </p>
       </div>
     </motion.div>
