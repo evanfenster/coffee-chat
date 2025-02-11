@@ -114,3 +114,13 @@ export const suggestion = pgTable(
 );
 
 export type Suggestion = InferSelectModel<typeof suggestion>;
+
+export const coffeeFilters = pgTable('coffeefilters', {
+  chatId: uuid('chatId')
+    .notNull()
+    .references(() => chat.id),
+  filters: json('filters').notNull(),
+  updatedAt: timestamp('updatedAt').notNull(),
+});
+
+export type CoffeeFilters = InferSelectModel<typeof coffeeFilters>;

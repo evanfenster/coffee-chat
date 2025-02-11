@@ -24,109 +24,130 @@ import { generateTitleFromUserMessage } from '../../actions';
 import { createDocument } from '@/lib/ai/tools/create-document';
 import { updateDocument } from '@/lib/ai/tools/update-document';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
-import { getWeather } from '@/lib/ai/tools/get-weather';
-import { getCoffeeOptions } from '@/lib/ai/tools/coffee-options';
+import { createSuggestCoffeeTool } from '@/lib/ai/tools/suggest-coffee';
+import { createGetCoffeeFiltersTool } from '@/lib/ai/tools/get-coffee-filters';
+import { createEditCoffeeFiltersTool } from '@/lib/ai/tools/edit-coffee-filters';
+import { createClearCoffeeFiltersTool } from '@/lib/ai/tools/clear-coffee-filters';
 
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
-  const {
-    id,
-    messages,
-    selectedChatModel,
-  }: { id: string; messages: Array<Message>; selectedChatModel: string } =
-    await request.json();
+  try {
+    console.log('🔵 [route] Processing chat request');
+    const {
+      id,
+      messages,
+      selectedChatModel,
+    }: { id: string; messages: Array<Message>; selectedChatModel: string } =
+      await request.json();
 
-  const session = await auth();
+    console.log('📝 [route] Request details:', { id, selectedChatModel, messageCount: messages.length });
 
-  if (!session || !session.user || !session.user.id) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+    const session = await auth();
 
-  const userMessage = getMostRecentUserMessage(messages);
+    if (!session || !session.user || !session.user.id) {
+      console.log('🔴 [route] Unauthorized - no valid session');
+      return new Response('Unauthorized', { status: 401 });
+    }
 
-  if (!userMessage) {
-    return new Response('No user message found', { status: 400 });
-  }
+    const userMessage = getMostRecentUserMessage(messages);
 
-  const chat = await getChatById({ id });
+    if (!userMessage) {
+      console.log('🔴 [route] No user message found');
+      return new Response('No user message found', { status: 400 });
+    }
 
-  if (!chat) {
-    const title = await generateTitleFromUserMessage({ message: userMessage });
-    await saveChat({ id, userId: session.user.id, title });
-  }
+    const chat = await getChatById({ id });
 
-  await saveMessages({
-    messages: [{ ...userMessage, createdAt: new Date(), chatId: id }],
-  });
+    if (!chat) {
+      console.log('📝 [route] Creating new chat');
+      const title = await generateTitleFromUserMessage({ message: userMessage });
+      await saveChat({ id, userId: session.user.id, title });
+    }
 
-  return createDataStreamResponse({
-    execute: (dataStream) => {
-      const result = streamText({
-        model: myProvider.languageModel(selectedChatModel),
-        system: systemPrompt({ selectedChatModel }),
-        messages,
-        maxSteps: 5,
-        experimental_activeTools:
-          selectedChatModel === 'chat-model-reasoning'
-            ? []
-            : [
-                'getWeather',
-                'createDocument',
-                'updateDocument',
-                'requestSuggestions',
-                'getCoffeeOptions',
-              ],
-        experimental_transform: smoothStream({ chunking: 'word' }),
-        experimental_generateMessageId: generateUUID,
-        tools: {
-          getWeather,
-          createDocument: createDocument({ session, dataStream }),
-          updateDocument: updateDocument({ session, dataStream }),
-          requestSuggestions: requestSuggestions({
-            session,
-            dataStream,
-          }),
-          getCoffeeOptions,
-        },
-        onFinish: async ({ response, reasoning }) => {
-          if (session.user?.id) {
-            try {
-              const sanitizedResponseMessages = sanitizeResponseMessages({
-                messages: response.messages,
-                reasoning,
-              });
+    await saveMessages({
+      messages: [{ ...userMessage, createdAt: new Date(), chatId: id }],
+    });
 
-              await saveMessages({
-                messages: sanitizedResponseMessages.map((message) => {
-                  return {
-                    id: message.id,
-                    chatId: id,
-                    role: message.role,
-                    content: message.content,
-                    createdAt: new Date(),
-                  };
-                }),
-              });
-            } catch (error) {
-              console.error('Failed to save chat');
+    return createDataStreamResponse({
+      execute: (dataStream) => {
+        console.log('📝 [route] Setting up stream with tools');
+        const result = streamText({
+          model: myProvider.languageModel(selectedChatModel),
+          system: systemPrompt({ selectedChatModel }),
+          messages,
+          maxSteps: 5,
+          experimental_activeTools:
+            selectedChatModel === 'chat-model-reasoning'
+              ? []
+              : [
+                  'createDocument',
+                  'updateDocument',
+                  'requestSuggestions',
+                  'suggestCoffee',
+                  'getCoffeeFilters',
+                  'editCoffeeFilters',
+                  'clearCoffeeFilters',
+                ],
+          experimental_transform: smoothStream({ chunking: 'word' }),
+          experimental_generateMessageId: generateUUID,
+          tools: {
+            createDocument: createDocument({ session, dataStream }),
+            updateDocument: updateDocument({ session, dataStream }),
+            requestSuggestions: requestSuggestions({
+              session,
+              dataStream,
+            }),
+            suggestCoffee: createSuggestCoffeeTool(id),
+            getCoffeeFilters: createGetCoffeeFiltersTool(id),
+            editCoffeeFilters: createEditCoffeeFiltersTool(id),
+            clearCoffeeFilters: createClearCoffeeFiltersTool(id),
+          },
+          onFinish: async ({ response, reasoning }) => {
+            if (session.user?.id) {
+              try {
+                const sanitizedResponseMessages = sanitizeResponseMessages({
+                  messages: response.messages,
+                  reasoning,
+                });
+
+                await saveMessages({
+                  messages: sanitizedResponseMessages.map((message) => {
+                    return {
+                      id: message.id,
+                      chatId: id,
+                      role: message.role,
+                      content: message.content,
+                      createdAt: new Date(),
+                    };
+                  }),
+                });
+              } catch (error) {
+                console.error('🔴 [route] Failed to save chat:', error);
+              }
             }
-          }
-        },
-        experimental_telemetry: {
-          isEnabled: true,
-          functionId: 'stream-text',
-        },
-      });
+          },
+          experimental_telemetry: {
+            isEnabled: true,
+            functionId: 'stream-text',
+          },
+        });
 
-      result.mergeIntoDataStream(dataStream, {
-        sendReasoning: true,
-      });
-    },
-    onError: () => {
-      return 'Oops, an error occured!';
-    },
-  });
+        result.mergeIntoDataStream(dataStream, {
+          sendReasoning: true,
+        });
+      },
+      onError: (error) => {
+        console.error('🔴 [route] Error in data stream:', error);
+        return 'Oops, an error occurred!';
+      },
+    });
+  } catch (error) {
+    console.error('🔴 [route] Unhandled error:', error);
+    return new Response('An error occurred while processing your request', {
+      status: 500,
+    });
+  }
 }
 
 export async function DELETE(request: Request) {

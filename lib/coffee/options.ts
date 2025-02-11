@@ -24,13 +24,13 @@ export const COFFEE_OPTIONS = {
     'Tropical Fruit',
   ] as const,
 
-  priceRanges: [
-    'Any',
-    '$15.75',
-    '$19.95',
-    '$20 - $25',
-    'Over $25',
-  ] as const,
+  // priceRanges: [
+  //   'Any',
+  //   '$15.75',
+  //   '$19.95',
+  //   '$20 - $25',
+  //   'Over $25',
+  // ] as const,
 
   regions: [
     'Africa',
@@ -125,12 +125,12 @@ export const COFFEE_OPTIONS = {
     'Wonderstate',
   ] as const,
 
-  bagWeights: [
-    'Small Bag (8 oz.)',
-    'Standard Bag (10.93 oz)',
-    'Big Bag (2 lb.)',
-    'Bulk (5 lb.)',
-  ] as const,
+  // bagWeights: [
+  //   'Small Bag (8 oz.)',
+  //   'Standard Bag (10.93 oz)',
+  //   'Big Bag (2 lb.)',
+  //   'Bulk (5 lb.)',
+  // ] as const,
 
   processes: [
     'Experimental/Other',
@@ -166,11 +166,11 @@ export const COFFEE_OPTIONS = {
 // Type definitions for better TypeScript support
 export type RoastLevel = typeof COFFEE_OPTIONS.roastLevels[number];
 export type TastingNote = typeof COFFEE_OPTIONS.tastingNotes[number];
-export type PriceRange = typeof COFFEE_OPTIONS.priceRanges[number];
+// export type PriceRange = typeof COFFEE_OPTIONS.priceRanges[number];
 export type Region = typeof COFFEE_OPTIONS.regions[number];
 export type Origin = typeof COFFEE_OPTIONS.origins[number];
 export type Roaster = typeof COFFEE_OPTIONS.roasters[number];
-export type BagWeight = typeof COFFEE_OPTIONS.bagWeights[number];
+// export type BagWeight = typeof COFFEE_OPTIONS.bagWeights[number];
 export type Process = typeof COFFEE_OPTIONS.processes[number];
 export type Certification = typeof COFFEE_OPTIONS.certifications[number];
 export type TasteType = typeof COFFEE_OPTIONS.tasteTypes[number]; 

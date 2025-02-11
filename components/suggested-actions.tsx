@@ -16,25 +16,24 @@ interface SuggestedActionsProps {
 function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
-      title: 'Recommend a coffee',
-      label: 'like milk chocolate',
-      action: 'Can you recommend a coffee bean based on my preference for smooth, medium roast coffee with chocolate notes?',
-
+      title: 'Find my perfect match',
+      label: 'based on my taste',
+      action: "I'd love to find a coffee that matches my taste. Help me discover what I enjoy and what I don't.",
     },
     {
-      title: 'Help me understand',
-      label: 'coffee roast levels',
-      action: 'What are the different coffee roast levels and how do they affect taste?',
+      title: 'Surprise me',
+      label: 'discover something new!',
+      action: "I'm feeling adventurous! Can you surprise me with an interesting coffee bean recommendation? I'm open to trying something unique and different.",
     },
     {
-      title: 'Find similar beans',
-      label: 'to Ethiopian Yirgacheffe',
-      action: 'I love Ethiopian Yirgacheffe coffee. Can you suggest similar coffee beans I might enjoy?',
+      title: 'Explore origins',
+      label: 'from around the world',
+      action: "I'm curious about coffee from different parts of the world. Could you recommend some interesting beans from regions known for unique flavors?",
     },
     {
-      title: 'Explain coffee terms',
-      label: 'like acidity and body',
-      action: 'Can you explain common coffee tasting terms like acidity, body, and mouthfeel?',
+      title: 'Recomend some',
+      label: 'light & fruity coffee beans',
+      action: "I love light, fruity coffees with bright flavors. Could you help me find beans with notes of berries, citrus, or florals?",
     },
   ];
 

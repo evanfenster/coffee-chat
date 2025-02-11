@@ -167,12 +167,13 @@ const PurePreviewMessage = ({
                             result={result}
                             isReadonly={isReadonly}
                           />
-                        ) : toolName === 'getCoffeeOptions' ? (
+                        ) : toolName === 'suggestCoffee' ? (
                           <CoffeeCard result={result} />
-                        ) : (
+                        ) : null}
+                        {/* Fallback JSON display for tools without explicit UI components
+                        : (
                           <pre>{JSON.stringify(result, null, 2)}</pre>
-                        )}
-
+                        )*/}
                       </div>
                     );
                   }
@@ -180,7 +181,7 @@ const PurePreviewMessage = ({
                     <div
                       key={toolCallId}
                       className={cx({
-                        skeleton: ['getWeather'].includes(toolName),
+                        skeleton: ['getWeather', 'suggestCoffee'].includes(toolName),
                       })}
                     >
                       {toolName === 'getWeather' ? (
@@ -199,6 +200,8 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
+                      ) : toolName === 'suggestCoffee' ? (
+                        <CoffeeCard result={{ products: [], appliedFilters: {} }} />
                       ) : null}
                     </div>
                   );

@@ -21,19 +21,9 @@ interface CoffeeProduct {
 }
 
 interface CoffeeOptionsResult {
-  totalResults: number
   products: CoffeeProduct[]
   appliedFilters: Record<string, unknown>
-  availableOptions: {
-    roastLevels: { count: number; options: string[] }
-    tastingNotes: { count: number; options: string[] }
-    regions: { count: number; options: string[] }
-    origins: { count: number; options: string[] }
-    roasters: { count: number; options: string[] }
-    processes: { count: number; options: string[] }
-    certifications: { count: number; options: string[] }
-    tasteTypes: { count: number; options: string[] }
-  }
+  error?: string
 }
 
 function formatArrayString(value: string): string {
@@ -52,7 +42,9 @@ export function CoffeeCard({
   className?: string
 }) {
   if (!result.products || result.products.length === 0) {
-    return <div className="p-4 text-neutral-600 text-center">No coffee options found with the specified criteria.</div>
+    return <div className="p-4 text-neutral-600 text-center">
+      {result.error || "No coffee options found with the specified criteria."}
+    </div>
   }
 
   const product = result.products[0]

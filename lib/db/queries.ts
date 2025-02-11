@@ -15,8 +15,10 @@ import {
   type Message,
   message,
   vote,
+  coffeeFilters,
 } from './schema';
 import { BlockKind } from '@/components/block';
+import { CoffeeFilters } from '@/lib/coffee/coffee-fetcher';
 
 // Optionally, if not using email/pass login, you can
 // use the Drizzle adapter for Auth.js / NextAuth
@@ -342,6 +344,98 @@ export async function updateChatVisiblityById({
     return await db.update(chat).set({ visibility }).where(eq(chat.id, chatId));
   } catch (error) {
     console.error('Failed to update chat visibility in database');
+    throw error;
+  }
+}
+
+export async function getCoffeeFiltersByChatId({ 
+  chatId 
+}: { 
+  chatId: string 
+}): Promise<CoffeeFilters | null> {
+  try {
+    const [result] = await db
+      .select()
+      .from(coffeeFilters)
+      .where(eq(coffeeFilters.chatId, chatId));
+
+    return result ? (result.filters as CoffeeFilters) : null;
+  } catch (error) {
+    console.error('Failed to get coffee filters from database');
+    throw error;
+  }
+}
+
+export async function saveCoffeeFilters({ 
+  chatId, 
+  filters 
+}: { 
+  chatId: string;
+  filters: CoffeeFilters;
+}) {
+  try {
+    const [existing] = await db
+      .select()
+      .from(coffeeFilters)
+      .where(eq(coffeeFilters.chatId, chatId));
+
+    if (existing) {
+      return await db
+        .update(coffeeFilters)
+        .set({ 
+          filters, 
+          updatedAt: new Date() 
+        })
+        .where(eq(coffeeFilters.chatId, chatId));
+    }
+
+    return await db
+      .insert(coffeeFilters)
+      .values({
+        chatId,
+        filters,
+        updatedAt: new Date(),
+      });
+  } catch (error) {
+    console.error('Failed to save coffee filters to database');
+    throw error;
+  }
+}
+
+export async function clearCoffeeFilters({ 
+  chatId,
+  category
+}: { 
+  chatId: string;
+  category?: keyof CoffeeFilters;
+}) {
+  try {
+    const [existing] = await db
+      .select()
+      .from(coffeeFilters)
+      .where(eq(coffeeFilters.chatId, chatId));
+
+    if (!existing) {
+      return;
+    }
+
+    let updatedFilters = { ...(existing.filters as CoffeeFilters) };
+    
+    if (category) {
+      delete updatedFilters[category];
+    } else {
+      updatedFilters = {};
+    }
+
+    return await db
+      .update(coffeeFilters)
+      .set({ 
+        filters: updatedFilters, 
+        updatedAt: new Date() 
+      })
+      .where(eq(coffeeFilters.chatId, chatId));
+  } catch (error) {
+    console.error('Failed to clear coffee filters in database');
     throw error;
   }
 }
