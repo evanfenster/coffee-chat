@@ -34,13 +34,13 @@ interface ChatModel {
 export const chatModels: Array<ChatModel> = [
   {
     id: 'chat-model-small',
-    name: 'Small model',
+    name: 'Quick Chat',
     description: 'Quick coffee recommendations and simple brewing questions',
   },
   {
     id: 'chat-model-large',
-    name: 'Large model',
-    description: 'Detailed coffee analysis and personalized tasting journeys',
+    name: 'Coffee Connoisseur',
+    description: 'Expert coffee analysis and complex brewing insights',
   },
   // {
   //   id: 'chat-model-reasoning',

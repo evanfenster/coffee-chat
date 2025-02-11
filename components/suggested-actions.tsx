@@ -49,7 +49,7 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
           className={index > 1 ? 'hidden sm:block' : 'block'}
         >
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={async () => {
               window.history.replaceState({}, '', `/chat/${chatId}`);
 
@@ -58,9 +58,9 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
                 content: suggestedAction.action,
               });
             }}
-            className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
+            className="text-left px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
           >
-            <span className="font-medium">{suggestedAction.title}</span>
+            <span className="font-medium text-base">{suggestedAction.title}</span>
             <span className="text-muted-foreground">
               {suggestedAction.label}
             </span>

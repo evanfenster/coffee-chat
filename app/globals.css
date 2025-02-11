@@ -1,18 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Source+Sans+Pro:wght@400;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
 :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 214, 219, 220;
-    --background-end-rgb: 255, 255, 255;
+    --foreground-rgb: 44, 28, 20;
+    --background-start-rgb: 253, 248, 242;
+    --background-end-rgb: 251, 245, 238;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --foreground-rgb: 255, 255, 255;
-        --background-start-rgb: 0, 0, 0;
-        --background-end-rgb: 0, 0, 0;
+        --foreground-rgb: 251, 245, 238;
+        --background-start-rgb: 44, 28, 20;
+        --background-end-rgb: 38, 24, 17;
     }
 }
 
@@ -24,30 +31,30 @@
 
 @layer base {
     :root {
-        --background: 30 25% 97%; /* Light cream */
-        --foreground: 25 30% 12%; /* Dark espresso */
-        --card: 30 25% 97%;
-        --card-foreground: 25 30% 12%;
-        --popover: 30 25% 97%;
-        --popover-foreground: 25 30% 12%;
-        --primary: 25 30% 12%; /* Dark espresso */
-        --primary-foreground: 30 25% 97%;
-        --secondary: 25 20% 92%; /* Light latte */
-        --secondary-foreground: 25 30% 12%;
-        --muted: 25 20% 92%;
-        --muted-foreground: 25 25% 45%; /* Muted coffee */
-        --accent: 30 25% 89%; /* Soft cappuccino */
-        --accent-foreground: 25 30% 12%;
+        --background: 40 30% 98%; /* Warm cream */
+        --foreground: 25 40% 15%; /* Rich espresso */
+        --card: 35 25% 97%;
+        --card-foreground: 25 40% 15%;
+        --popover: 35 25% 97%;
+        --popover-foreground: 25 40% 15%;
+        --primary: 25 40% 15%; /* Rich espresso */
+        --primary-foreground: 40 30% 98%;
+        --secondary: 30 25% 92%; /* Creamy latte */
+        --secondary-foreground: 25 40% 15%;
+        --muted: 30 25% 92%;
+        --muted-foreground: 25 30% 45%; /* Roasted coffee */
+        --accent: 35 35% 85%; /* Warm cappuccino */
+        --accent-foreground: 25 40% 15%;
         --destructive: 0 84% 60%;
         --destructive-foreground: 0 0% 98%;
-        --border: 25 25% 85%; /* Latte border */
-        --input: 25 25% 85%;
-        --ring: 25 30% 12%;
-        --chart-1: 25 65% 55%; /* Light coffee */
-        --chart-2: 35 60% 65%; /* Caramel latte */
-        --chart-3: 15 55% 45%; /* Medium roast */
-        --chart-4: 40 65% 75%; /* Cream */
-        --chart-5: 20 50% 50%; /* Coffee */
+        --border: 30 30% 85%; /* Warm border */
+        --input: 30 30% 85%;
+        --ring: 25 40% 15%;
+        --chart-1: 25 70% 45%; /* Coffee brown */
+        --chart-2: 35 65% 55%; /* Caramel */
+        --chart-3: 15 60% 35%; /* Dark roast */
+        --chart-4: 40 70% 65%; /* Cream */
+        --chart-5: 20 55% 40%; /* Medium roast */
         --radius: 0.5rem;
         --sidebar-background: 30 25% 95%; /* Light cream sidebar */
         --sidebar-foreground: 25 25% 30%;
@@ -101,6 +108,12 @@
 
     body {
         @apply bg-background text-foreground;
+        font-family: 'Source Sans Pro', sans-serif;
+        background-image: 
+            linear-gradient(to bottom, 
+                rgba(253, 248, 242, 0.97), 
+                rgba(251, 245, 238, 0.97)),
+            url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0C13.4315 0 0 13.4315 0 30C0 46.5685 13.4315 60 30 60C46.5685 60 60 46.5685 60 30C60 13.4315 46.5685 0 30 0ZM30 45C21.7157 45 15 38.2843 15 30C15 21.7157 21.7157 15 30 15C38.2843 15 45 21.7157 45 30C45 38.2843 38.2843 45 30 45Z' fill='%23D4C3B3' fill-opacity='0.1'/%3E%3C/svg%3E");
     }
 
     @font-face {
@@ -175,4 +188,19 @@
 
 .suggestion-highlight {
     @apply bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-400/50 dark:text-blue-50 dark:bg-blue-500/40;
+}
+
+h1, h2, h3, h4, .brand-text {
+    font-family: 'Playfair Display', serif;
+}
+
+/* Add a subtle texture to cards */
+.card, [class*='card-'] {
+    box-shadow: 0 2px 8px rgba(44, 28, 20, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover, [class*='card-']:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44, 28, 20, 0.1);
 }
