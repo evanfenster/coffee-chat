@@ -25,7 +25,7 @@ export const Overview = () => {
         
         <div className="space-y-4 text-muted-foreground">
           <p className="text-lg">
-            Let's find your next favorite coffee.
+            Let&apos;s find your next favorite coffee.
           </p>
         </div>
       </div>
