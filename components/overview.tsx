@@ -25,10 +25,7 @@ export const Overview = () => {
         
         <div className="space-y-4 text-muted-foreground">
           <p className="text-lg">
-            Your personal coffee companion, here to help you discover your next favorite brew.
-          </p>
-          <p className="text-base">
-            Whether you're a coffee connoisseur or just starting your journey, we'll guide you through the wonderful world of artisanal coffee.
+            Let's find your next favorite coffee.
           </p>
         </div>
       </div>
