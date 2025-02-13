@@ -6,7 +6,7 @@ import { getCoffeeProducts } from '@/lib/coffee/coffee-fetcher';
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const createSuggestCoffeeTool = (chatId: string) => tool({
-  description: 'Suggest a coffee bean that best matches the current filters set, or random if no filters are set. This tool should be called immediately after editCoffeeFilters returns shouldSuggest: true, as it will wait for filter changes to be saved before making a suggestion.',
+  description: 'Suggest a coffee bean that best matches the current filters set, or random if no filters are set. This tool should be called immediately after editCoffeeFilters returns shouldSuggest: true, as it will wait for filter changes to be saved before making a suggestion. OR it can be called earlier if the user wants a recommendation now.',
   parameters: z.object({}),
   execute: async () => {
     console.log('🔵 [suggestCoffee] Called with chatId:', chatId);

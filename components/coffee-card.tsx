@@ -1,6 +1,7 @@
 "use client"
 
-import Image from "next/image"
+import React, { useState } from "react"
+import { Coffee } from "lucide-react"
 import cx from "classnames"
 
 interface CoffeeProduct {
@@ -26,12 +27,15 @@ interface CoffeeOptionsResult {
   error?: string
 }
 
-function formatArrayString(value: string): string {
+function formatArrayString(value: string | string[]): string[] {
+  if (Array.isArray(value)) {
+    return value
+  }
   return value
     .replace(/[[\]"]/g, "")
     .split(",")
     .map((s) => s.trim())
-    .join(", ")
+    .filter(Boolean)
 }
 
 export function CoffeeCard({
@@ -41,6 +45,9 @@ export function CoffeeCard({
   result: CoffeeOptionsResult
   className?: string
 }) {
+  const [imageLoading, setImageLoading] = useState(true)
+  const [imageError, setImageError] = useState(false)
+
   if (!result.products || result.products.length === 0) {
     return <div className="p-4 text-neutral-600 text-center">
       {result.error || "No coffee options found with the specified criteria."}
@@ -49,154 +56,193 @@ export function CoffeeCard({
 
   const product = result.products[0]
 
+  const handleImageLoad = () => {
+    setImageLoading(false)
+  }
+
+  const handleImageError = () => {
+    setImageLoading(false)
+    setImageError(true)
+  }
+
   return (
-    <div
+    <article 
       className={cx(
-        "flex flex-col rounded-3xl overflow-hidden bg-white border border-stone-200 max-w-[800px] shadow-sm",
-        className,
+        "bg-white rounded-md shadow-sm overflow-hidden transition-transform hover:shadow-md w-full max-w-2xl",
+        className
       )}
+      aria-labelledby="coffee-name"
     >
-      <div className="flex flex-col md:flex-row">
-        {/* Image Section - Larger and without background */}
-        <div className="md:w-1/2 flex items-center justify-center">
-          <div className="relative w-full aspect-square max-w-[400px]">
-            {product.imageUrl ? (
-              <Image
-                src={product.imageUrl || "/placeholder.svg"}
-                alt={`${product.name} coffee`}
-                fill
-                className="object-contain transition-transform duration-300 hover:scale-105"
-                priority
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-stone-400">No image available</span>
-              </div>
-            )}
-          </div>
+      <div className="flex flex-col sm:flex-row">
+        {/* Image Container */}
+        <div className="relative w-full sm:w-48 aspect-[4/3] sm:aspect-square overflow-hidden bg-stone-50 flex-shrink-0">
+          {imageLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-stone-50">
+              <div className="animate-pulse w-8 h-8 bg-stone-200 rounded-full" />
+            </div>
+          )}
+          
+          {imageError ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-stone-400">
+              <Coffee className="w-8 h-8 mb-1" />
+              <span className="text-xs">Image unavailable</span>
+            </div>
+          ) : product.imageUrl && (
+            <img
+              src={product.imageUrl}
+              alt={`${product.name} coffee`}
+              className={`w-full h-full object-cover transition-opacity duration-300 ${
+                imageLoading ? 'opacity-0' : 'opacity-100'
+              }`}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+            />
+          )}
         </div>
 
-        {/* Content Section */}
-        <div className="md:w-1/2 p-6 flex flex-col">
-          {/* Vendor */}
-          <div className="text-sm font-medium text-amber-700 mb-4">{product.vendor}</div>
+        {/* Content Container */}
+        <div className="flex flex-col flex-grow">
+          <div className="p-3">
+            {/* Vendor */}
+            <div className="text-xs font-medium text-amber-700 mb-1">
+              {product.vendor}
+            </div>
 
-          {/* Title and Type */}
-          <div className="mb-6">
-            <h3 className="text-2xl font-bold text-stone-900">{product.name}</h3>
-            {product.type && <div className="text-base text-stone-600 mt-1">{product.type}</div>}
-          </div>
+            {/* Title and Type */}
+            <h2 
+              id="coffee-name"
+              className="text-lg font-bold text-stone-900 mb-1"
+            >
+              {product.name}
+            </h2>
+            
+            {product.type && (
+              <div className="text-sm text-stone-600 mb-2">
+                {product.type}
+              </div>
+            )}
 
-          {/* Tags Section */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {product.roastLevel && (
-              <span className="px-3 py-1 bg-amber-50 text-amber-900 text-sm font-medium rounded-lg">
-                {product.roastLevel} Roast
-              </span>
-            )}
-            {product.process && (
-              <span className="px-3 py-1 bg-amber-50 text-amber-900 text-sm font-medium rounded-lg">
-                {formatArrayString(product.process)}
-              </span>
-            )}
-            {product.tasteType && (
-              <span className="px-3 py-1 bg-amber-50 text-amber-900 text-sm font-medium rounded-lg">
-                {product.tasteType}
-              </span>
-            )}
-          </div>
+            {/* Tags Section */}
+            <div className="flex flex-wrap gap-1 mb-2">
+              {product.roastLevel && formatArrayString(product.roastLevel).map((level, index) => (
+                <span 
+                  key={index}
+                  className="px-2 py-0.5 bg-amber-50 text-amber-800 text-xs font-medium rounded-full"
+                >
+                  {level} Roast
+                </span>
+              ))}
+              {product.tasteType && formatArrayString(product.tasteType).map((type, index) => (
+                <span 
+                  key={index}
+                  className="px-2 py-0.5 bg-amber-50 text-amber-800 text-xs font-medium rounded-full"
+                >
+                  {type}
+                </span>
+              ))}
+              {product.process && formatArrayString(product.process).map((proc, index) => (
+                <span 
+                  key={index}
+                  className="px-2 py-0.5 bg-amber-50 text-amber-800 text-xs font-medium rounded-full"
+                >
+                  {proc}
+                </span>
+              ))}
+            </div>
 
-          {/* Details Grid */}
-          <div className="grid gap-6 mb-6">
             {/* Origin & Region */}
             {(product.origin || product.region) && (
-              <div className="space-y-2">
-                <span className="text-xs font-medium uppercase tracking-wider text-stone-500">Origin</span>
-                <div className="flex flex-wrap gap-2">
-                  {product.origin && (
-                    <span className="px-3 py-1.5 bg-orange-50 text-orange-900 text-sm font-medium rounded-lg border border-orange-100">
-                      {formatArrayString(product.origin)}
+              <div className="mb-2">
+                <span className="text-xs font-medium uppercase tracking-wider text-stone-500 mb-1 block">
+                  Origin
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {product.origin && formatArrayString(product.origin).map((orig, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 bg-orange-50 text-orange-900 text-xs font-medium rounded-md border border-orange-100"
+                    >
+                      {orig}
                     </span>
-                  )}
-                  {product.region && (
-                    <span className="px-3 py-1.5 bg-emerald-50 text-emerald-900 text-sm font-medium rounded-lg border border-emerald-100">
-                      {formatArrayString(product.region)}
+                  ))}
+                  {product.region && formatArrayString(product.region).map((reg, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 bg-emerald-50 text-emerald-900 text-xs font-medium rounded-md border border-emerald-100"
+                    >
+                      {reg}
                     </span>
-                  )}
+                  ))}
                 </div>
               </div>
             )}
 
             {/* Tasting Notes */}
             {product.tastingNotes && product.tastingNotes.length > 0 && (
-              <div className="space-y-2">
-                <span className="text-xs font-medium uppercase tracking-wider text-stone-500">Tasting Notes</span>
-                <div className="flex flex-wrap gap-2">
-                  {product.tastingNotes.map((note) => (
+              <div className="mb-2">
+                <span className="text-xs font-medium uppercase tracking-wider text-stone-500 mb-1 block">
+                  Tasting Notes
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {product.tastingNotes.map((note, index) => (
                     <span
-                      key={note}
-                      className="px-3 py-1.5 bg-amber-50 text-amber-800 text-sm font-medium rounded-lg border border-amber-200"
+                      key={index}
+                      className="px-2 py-1 bg-amber-50 text-amber-800 text-xs font-medium rounded-md border border-amber-200"
                     >
-                      {formatArrayString(note)}
+                      {note}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Certifications */}
+            {product.certifications && product.certifications.length > 0 && (
+              <div className="mb-2">
+                <span className="text-xs font-medium uppercase tracking-wider text-stone-500 mb-1 block">
+                  Certifications
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {product.certifications.map((cert, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 bg-blue-50 text-blue-800 text-xs font-medium rounded-md border border-blue-200"
+                    >
+                      {formatArrayString(cert)}
                     </span>
                   ))}
                 </div>
               </div>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* Checkout Section */}
-      <div className="relative mt-auto">
-        {/* Decorative diagonal line */}
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_49.5%,#2c1810_49.5%,#2c1810_50.5%,transparent_50.5%)]" />
-
-        <div className="px-8 py-6 bg-gradient-to-br from-[#3C2A1E] to-[#2C1810] relative">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col items-start">
-              <div className="text-sm font-medium text-stone-400 tracking-wide uppercase mb-1">Price</div>
-              <div className="relative">
-                <div className="text-4xl font-bold text-white tracking-tight">${Number(product.price).toFixed(2)}</div>
-                <div className="absolute -right-4 -top-3 text-amber-400 text-sm font-medium">USD</div>
-              </div>
+          {/* Checkout Section - Now full width at bottom */}
+          <div className="flex items-center justify-between p-3 mt-auto border-t border-stone-100">
+            <div className="flex items-baseline gap-0.5">
+              <span className="text-lg font-bold text-stone-900">
+                ${Number(product.price).toFixed(2)}
+              </span>
+              <span className="text-xs text-stone-500">USD</span>
             </div>
 
-            <div className="flex items-center gap-4">
-              {!product.available && (
-                <span className="px-4 py-2 bg-red-500/10 text-red-300 text-sm font-medium rounded-full border border-red-300/20 backdrop-blur-sm">
-                  Out of Stock
-                </span>
-              )}
-              <button
-                className={cx(
-                  "group relative px-8 py-3.5 rounded-2xl font-medium text-lg transition-all duration-300",
-                  "before:absolute before:inset-0 before:rounded-2xl before:transition-all before:duration-300",
-                  product.available
-                    ? [
-                        "text-white overflow-hidden",
-                        "before:bg-gradient-to-r before:from-amber-500 before:to-orange-500",
-                        "hover:before:scale-105 hover:before:opacity-90",
-                        "active:before:scale-100 active:before:opacity-100",
-                      ].join(" ")
-                    : ["text-stone-400 bg-stone-800/50", "cursor-not-allowed"].join(" "),
-                )}
-                disabled={!product.available}
-              >
-                <span className="relative">{product.available ? "Add to Cart" : "Sold Out"}</span>
-                {product.available && (
-                  <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
-                    <svg className="size-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </span>
-                )}
-              </button>
-            </div>
+            <button
+              disabled={!product.available}
+              className={`
+                px-3 py-1 rounded-md text-sm font-medium transition-all
+                focus:outline-none focus:ring-2 focus:ring-offset-1
+                ${product.available
+                  ? 'bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-500'
+                  : 'bg-stone-200 text-stone-500 cursor-not-allowed'
+                }
+              `}
+              aria-disabled={!product.available}
+            >
+              {product.available ? 'Add to Cart' : 'Sold Out'}
+            </button>
           </div>
         </div>
       </div>
-    </div>
+    </article>
   )
 }
 
