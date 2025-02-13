@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Toaster } from 'sonner';
+import { Analytics } from '@vercel/analytics/next';
 
 import { ThemeProvider } from '@/components/theme-provider';
 
@@ -66,6 +67,7 @@ export default async function RootLayout({
         >
           <Toaster position="top-center" />
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
