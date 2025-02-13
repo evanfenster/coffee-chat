@@ -1,0 +1,1 @@
+ALTER TABLE "coffeefilters" ADD PRIMARY KEY ("chatId");
