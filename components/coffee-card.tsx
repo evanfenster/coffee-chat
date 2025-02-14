@@ -47,6 +47,7 @@ export function CoffeeCard({
 }) {
   const [imageLoading, setImageLoading] = useState(true)
   const [imageError, setImageError] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   if (!result.products || result.products.length === 0) {
     return <div className="p-4 text-neutral-600 text-center">
@@ -63,6 +64,44 @@ export function CoffeeCard({
   const handleImageError = () => {
     setImageLoading(false)
     setImageError(true)
+  }
+
+  const handleBuyNow = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/stripe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: product.name,
+          price: product.price,
+          imageUrl: product.imageUrl,
+        }),
+      })
+
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, message: ${data.error || 'Unknown error'}`)
+      }
+      
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      if (!data.url) {
+        throw new Error('No checkout URL received from Stripe')
+      }
+
+      // Open Stripe checkout in a new tab
+      window.open(data.url, '_blank')
+    } catch (error) {
+      console.error('Error creating checkout session:', error instanceof Error ? error.message : 'Unknown error')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -226,18 +265,19 @@ export function CoffeeCard({
             </div>
 
             <button
-              disabled={!product.available}
+              disabled={!product.available || isLoading}
+              onClick={handleBuyNow}
               className={`
                 px-3 py-1 rounded-md text-sm font-medium transition-all
                 focus:outline-none focus:ring-2 focus:ring-offset-1
-                ${product.available
+                ${product.available && !isLoading
                   ? 'bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-500'
                   : 'bg-stone-200 text-stone-500 cursor-not-allowed'
                 }
               `}
-              aria-disabled={!product.available}
+              aria-disabled={!product.available || isLoading}
             >
-              {product.available ? 'Add to Cart' : 'Sold Out'}
+              {isLoading ? 'Loading...' : product.available ? 'Buy Now' : 'Sold Out'}
             </button>
           </div>
         </div>
