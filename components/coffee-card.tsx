@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Coffee } from "lucide-react"
 import cx from "classnames"
 
@@ -48,14 +48,7 @@ export function CoffeeCard({
   const [imageLoading, setImageLoading] = useState(true)
   const [imageError, setImageError] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-
-  if (!result.products || result.products.length === 0) {
-    return <div className="p-4 text-neutral-600 text-center">
-      {result.error || "No coffee options found with the specified criteria."}
-    </div>
-  }
-
-  const product = result.products[0]
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
 
   const handleImageLoad = () => {
     setImageLoading(false)
@@ -66,9 +59,60 @@ export function CoffeeCard({
     setImageError(true)
   }
 
+  // Preload the checkout URL when the component mounts
+  useEffect(() => {
+    if (!result.products?.[0]?.available) return;
+
+    const product = result.products[0];
+    const prepareCheckout = async () => {
+      try {
+        const response = await fetch('/api/stripe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: product.name,
+            price: product.price,
+            imageUrl: product.imageUrl,
+          }),
+        })
+
+        const data = await response.json()
+        
+        if (!response.ok || data.error || !data.url) {
+          console.error('Failed to prepare checkout:', data.error || 'Unknown error')
+          return
+        }
+
+        setCheckoutUrl(data.url)
+      } catch (error) {
+        console.error('Error preparing checkout:', error)
+      }
+    }
+
+    prepareCheckout()
+  }, [result.products])
+
+  if (!result.products || result.products.length === 0) {
+    return <div className="p-4 text-neutral-600 text-center">
+      {result.error || "No coffee options found with the specified criteria."}
+    </div>
+  }
+
+  const product = result.products[0]
+
   const handleBuyNow = async () => {
     try {
       setIsLoading(true)
+      
+      // If we already have a checkout URL, use it
+      if (checkoutUrl) {
+        window.open(checkoutUrl, '_blank')
+        return
+      }
+
+      // Otherwise, create a new checkout session
       const response = await fetch('/api/stripe', {
         method: 'POST',
         headers: {
