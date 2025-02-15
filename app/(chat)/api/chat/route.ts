@@ -28,6 +28,7 @@ import { createSuggestCoffeeTool } from '@/lib/ai/tools/suggest-coffee';
 import { createGetCoffeeFiltersTool } from '@/lib/ai/tools/get-coffee-filters';
 import { createEditCoffeeFiltersTool } from '@/lib/ai/tools/edit-coffee-filters';
 import { createClearCoffeeFiltersTool } from '@/lib/ai/tools/clear-coffee-filters';
+import { createGetKnowledgeTool } from '@/lib/ai/tools/get-knowledge';
 
 export const maxDuration = 60;
 
@@ -88,6 +89,7 @@ export async function POST(request: Request) {
                   'getCoffeeFilters',
                   'editCoffeeFilters',
                   'clearCoffeeFilters',
+                  'getKnowledge',
                 ],
           experimental_transform: smoothStream({ chunking: 'word' }),
           experimental_generateMessageId: generateUUID,
@@ -102,6 +104,7 @@ export async function POST(request: Request) {
             getCoffeeFilters: createGetCoffeeFiltersTool(id),
             editCoffeeFilters: createEditCoffeeFiltersTool(id),
             clearCoffeeFilters: createClearCoffeeFiltersTool(id),
+            getKnowledge: createGetKnowledgeTool(),
           },
           onFinish: async ({ response, reasoning }) => {
             if (session.user?.id) {

@@ -9,6 +9,8 @@ import {
   primaryKey,
   foreignKey,
   boolean,
+  vector,
+  index,
 } from 'drizzle-orm/pg-core';
 import { blockKinds } from '../blocks/server';
 
@@ -125,3 +127,30 @@ export const coffeeFilters = pgTable('coffeefilters', {
 });
 
 export type CoffeeFilters = InferSelectModel<typeof coffeeFilters>;
+
+export const knowledgeResource = pgTable('KnowledgeResource', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+  filePath: text('filePath').notNull(),
+  fileHash: varchar('fileHash', { length: 64 }).notNull().unique(),
+  content: text('content').notNull(),
+});
+
+export const knowledgeEmbedding = pgTable(
+  'KnowledgeEmbedding',
+  {
+    id: uuid('id').primaryKey().notNull().defaultRandom(),
+    resourceId: uuid('resourceId')
+      .notNull()
+      .references(() => knowledgeResource.id, { onDelete: 'cascade' }),
+    content: text('content').notNull(),
+    embedding: vector('embedding', { dimensions: 1536 }).notNull(),
+  },
+  (table) => ({
+    embeddingIdx: index('embedding_idx').using('hnsw', table.embedding.op('vector_cosine_ops')),
+  }),
+);
+
+export type KnowledgeResource = InferSelectModel<typeof knowledgeResource>;
+export type KnowledgeEmbedding = InferSelectModel<typeof knowledgeEmbedding>;

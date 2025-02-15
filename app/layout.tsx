@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { Toaster } from 'sonner';
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-
+import { GeistSans } from 'geist/font/sans';
 import { ThemeProvider } from '@/components/theme-provider';
+import { initializeKnowledgeBase } from '@/lib/knowledge';
 
 import './globals.css';
 
@@ -38,11 +39,14 @@ const THEME_COLOR_SCRIPT = `\
   updateThemeColor();
 })();`;
 
-export default async function RootLayout({
+// Initialize knowledge base
+initializeKnowledgeBase().catch(console.error);
+
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
@@ -59,7 +63,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased">
+      <body className={GeistSans.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
