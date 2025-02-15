@@ -62,15 +62,8 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 rounded-md">
-        <h2 className="text-lg font-bold text-red-600 mb-2">Error</h2>
-        <p className="text-gray-600 mb-4">{error}</p>
-        <button
-          onClick={onClose}
-          className="px-4 py-2 bg-white text-gray-700 rounded hover:bg-gray-50 border border-gray-200"
-        >
-          Close
-        </button>
+      <div className="rounded-lg p-4 bg-red-50">
+        <p className="text-sm text-red-500">Could not load checkout. Please try again.</p>
       </div>
     )
   }
@@ -79,14 +72,14 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
     return (
       <div className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-md border border-emerald-100">
         <div className="flex flex-col items-center text-center">
-          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="size-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <svg className="size-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           <h2 className="text-xl font-bold text-green-800 mb-2">Payment Successful!</h2>
           <p className="text-gray-600 mb-6">
-            Thank you for your purchase. We'll send your coffee details and confirmation to your email shortly.
+            Thank you for your purchase. We&apos;ll send your coffee details and confirmation to your email shortly.
           </p>
           <button
             onClick={onClose}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react"
 import { Coffee } from "lucide-react"
 import cx from "classnames"
 import { EmbeddedCheckoutDialog } from "./embedded-checkout"
+import Image from 'next/image'
 
 interface CoffeeProduct {
   name: string
@@ -78,33 +79,37 @@ export function CoffeeCard({
       >
         <div className="flex flex-col sm:flex-row">
           {/* Image Container */}
-          <div className="relative w-full sm:w-48 aspect-[4/3] sm:aspect-square overflow-hidden bg-stone-50 flex-shrink-0">
-            {imageLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-stone-50">
-                <div className="animate-pulse w-8 h-8 bg-stone-200 rounded-full" />
-              </div>
-            )}
-            
-            {imageError ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-stone-400">
-                <Coffee className="w-8 h-8 mb-1" />
-                <span className="text-xs">Image unavailable</span>
-              </div>
-            ) : product.imageUrl && (
-              <img
-                src={product.imageUrl}
-                alt={`${product.name} coffee`}
-                className={`w-full h-full object-cover transition-opacity duration-300 ${
-                  imageLoading ? 'opacity-0' : 'opacity-100'
-                }`}
-                onLoad={handleImageLoad}
-                onError={handleImageError}
-              />
-            )}
+          <div className="shrink-0">
+            <div className="relative w-full sm:w-48 aspect-[4/3] sm:aspect-square overflow-hidden bg-stone-50">
+              {imageLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-stone-50">
+                  <div className="animate-pulse size-8 bg-stone-200 rounded-full" />
+                </div>
+              )}
+              
+              {imageError ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-stone-400">
+                  <Coffee className="size-8 mb-1" />
+                  <span className="text-xs">Image unavailable</span>
+                </div>
+              ) : product.imageUrl && (
+                <Image
+                  src={product.imageUrl}
+                  alt={`${product.name} coffee`}
+                  className={`size-full object-cover transition-opacity duration-300 ${
+                    imageLoading ? 'opacity-0' : 'opacity-100'
+                  }`}
+                  onLoad={handleImageLoad}
+                  onError={handleImageError}
+                  width={192}
+                  height={144}
+                />
+              )}
+            </div>
           </div>
 
           {/* Content Container */}
-          <div className="flex flex-col flex-grow">
+          <div className="grow">
             <div className="p-3">
               {/* Vendor */}
               <div className="text-xs font-medium text-amber-700 mb-1">

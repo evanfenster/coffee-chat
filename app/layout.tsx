@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Toaster } from 'sonner';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { GeistSans } from 'geist/font/sans';
 import { ThemeProvider } from '@/components/theme-provider';
 import { initializeKnowledgeBase } from '@/lib/knowledge';
 
@@ -63,7 +62,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={GeistSans.className}>
+      <body className="antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
