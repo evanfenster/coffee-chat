@@ -17,7 +17,6 @@ import {
 import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
-import { Weather } from './weather';
 import { CoffeeCard } from './coffee-card';
 import equal from 'fast-deep-equal';
 import { cn } from '@/lib/utils';
@@ -148,9 +147,7 @@ const PurePreviewMessage = ({
 
                     return (
                       <div key={toolCallId}>
-                        {toolName === 'getWeather' ? (
-                          <Weather weatherAtLocation={result} />
-                        ) : toolName === 'createDocument' ? (
+                        {toolName === 'createDocument' ? (
                           <DocumentPreview
                             isReadonly={isReadonly}
                             result={result}
@@ -181,12 +178,10 @@ const PurePreviewMessage = ({
                     <div
                       key={toolCallId}
                       className={cx({
-                        skeleton: ['getWeather', 'suggestCoffee'].includes(toolName),
+                        skeleton: ['suggestCoffee'].includes(toolName),
                       })}
                     >
-                      {toolName === 'getWeather' ? (
-                        <Weather />
-                      ) : toolName === 'createDocument' ? (
+                      {toolName === 'createDocument' ? (
                         <DocumentPreview isReadonly={isReadonly} args={args} />
                       ) : toolName === 'updateDocument' ? (
                         <DocumentToolCall
