@@ -115,7 +115,47 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
         stripe={stripePromise}
         options={{
           clientSecret,
-          onComplete: () => {
+          onComplete: async () => {
+            try {
+              const sessionId = clientSecret.split('_secret_')[0]
+              
+              // Create cardholder first
+              const cardholderResponse = await fetch('/api/stripe/create-cardholder', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ sessionId }),
+              })
+
+              if (!cardholderResponse.ok) {
+                const errorData = await cardholderResponse.json()
+                console.error('Failed to create cardholder:', errorData.error)
+                setStatus('complete')
+                return
+              }
+
+              // Then create virtual card
+              const cardResponse = await fetch('/api/stripe/create-virtual-card', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ sessionId }),
+              })
+
+              if (!cardResponse.ok) {
+                const errorData = await cardResponse.json()
+                console.error('Failed to create virtual card:', errorData.error)
+                setStatus('complete')
+                return
+              }
+
+              const { cardId } = await cardResponse.json()
+              console.log('Virtual card created:', cardId)
+            } catch (error) {
+              console.error('Error in checkout completion:', error)
+            }
             setStatus('complete')
           },
         }}

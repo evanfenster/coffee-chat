@@ -57,6 +57,20 @@
       "when": 1739646223331,
       "tag": "0007_lean_white_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1740114509117,
+      "tag": "0008_tan_george_stacy",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1740115468520,
+      "tag": "0009_volatile_mole_man",
+      "breakpoints": true
     }
   ]
 }
