@@ -1,6 +1,6 @@
 import { Block } from "@/components/create-block";
-import { CoffeeCard } from "@/components/coffee-card";
-import { CoffeeProduct } from "@/lib/coffee/coffee-fetcher";
+import { ProductCard } from "@/components/product-card";
+import { Product } from "@/lib/coffee/coffee-fetcher";
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect } from "react";
 import { fetcher } from '@/lib/utils';
@@ -9,7 +9,7 @@ import { UIBlock } from "@/components/block";
 import { InitializeParameters, StreamPartParameters, StreamPart } from "@/components/create-block";
 
 interface CheckoutSuggestion {
-  product: CoffeeProduct;
+  product: Product;
   appliedFilters: Record<string, unknown>;
   createdAt: string;
   description: string;
@@ -17,7 +17,7 @@ interface CheckoutSuggestion {
 
 export interface CheckoutBlockMetadata {
   suggestions: {
-    product: CoffeeProduct;
+    product: Product;
     appliedFilters: Record<string, unknown>;
     timestamp: number;
     description: string;
@@ -27,7 +27,7 @@ export interface CheckoutBlockMetadata {
 }
 
 // Helper function to find suggestion index by product
-function findSuggestionIndex(suggestions: CheckoutBlockMetadata['suggestions'], product: CoffeeProduct): number {
+function findSuggestionIndex(suggestions: CheckoutBlockMetadata['suggestions'], product: Product): number {
   return suggestions.findIndex(s => 
     s.product.name === product.name && 
     s.product.vendor === product.vendor
@@ -163,8 +163,8 @@ export const checkoutBlock = new Block<"checkout", CheckoutBlockMetadata>({
                     key={index}
                     className={`size-1.5 rounded-full transition-colors ${
                       index === metadata.currentSuggestionIndex
-                        ? 'bg-amber-500 dark:bg-amber-400'
-                        : 'bg-border hover:bg-amber-500/50 dark:hover:bg-amber-400/50'
+                        ? 'bg-[hsl(var(--brand-accent))]'
+                        : 'bg-border hover:bg-[hsl(var(--brand-accent-muted))]'
                     }`}
                     onClick={() => {
                       console.log('Changing suggestion to index:', index);
@@ -179,9 +179,9 @@ export const checkoutBlock = new Block<"checkout", CheckoutBlockMetadata>({
           )
         }
       >
-        {/* Coffee Card */}
+        {/* Product Card */}
         {currentSuggestion?.product && (
-          <CoffeeCard 
+          <ProductCard 
             key={`${currentSuggestion.product.name}-${currentSuggestion.product.vendor}-${metadata.currentSuggestionIndex}`}
             result={{
               products: [currentSuggestion.product],

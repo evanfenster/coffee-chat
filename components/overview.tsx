@@ -1,7 +1,5 @@
 import { motion } from 'framer-motion';
-import Link from 'next/link';
-
-import { CoffeeIcon, MessageIcon } from './icons';
+import { APP_CONFIG } from '@/config/app.config';
 
 export const Overview = () => {
   return (
@@ -15,17 +13,14 @@ export const Overview = () => {
     >
       <div className="p-8 flex flex-col gap-8 leading-relaxed text-center max-w-xl mx-auto">
         <div className="flex flex-col gap-4">
-          <h1 className="text-4xl font-semibold brand-text text-amber-800 dark:text-amber-200">Welcome to Coffee Chat</h1>
-          <p className="flex flex-row justify-center gap-4 items-center text-amber-700 dark:text-amber-300">
-            <CoffeeIcon size={32} className="animate-[wiggle_1s_ease-in-out_infinite]" />
-            <span className="font-playfair text-2xl">+</span>
-            <MessageIcon size={32} />
-          </p>
+          <h1 className="text-4xl font-semibold brand-text text-[hsl(var(--brand-title))]">
+            {APP_CONFIG.welcome.title}
+          </h1>
         </div>
         
         <div className="space-y-4 text-muted-foreground">
           <p className="text-lg">
-            Let&apos;s find your next favorite coffee.
+            {APP_CONFIG.welcome.tagline}
           </p>
         </div>
       </div>

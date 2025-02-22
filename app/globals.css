@@ -64,6 +64,23 @@
         --sidebar-accent-foreground: 25 30% 12%;
         --sidebar-border: 25 25% 85%;
         --sidebar-ring: 25 55% 35%;
+        --tag-primary: 25 40% 15%;
+        --tag-primary-foreground: 40 30% 98%;
+        --tag-primary-border: 25 40% 25%;
+        --tag-accent: 30 35% 25%;
+        --tag-accent-foreground: 40 30% 98%;
+        --tag-accent-border: 30 35% 35%;
+        --badge-background: 25 70% 45%;
+        --badge-foreground: 40 30% 98%;
+        --badge-border: 25 70% 55%;
+        
+        /* Brand theme specific colors */
+        --brand-title: 35 80% 25%; /* Main heading color */
+        --brand-text: 35 75% 35%; /* Secondary text color */
+        --brand-accent: 35 85% 50%; /* Primary accent color */
+        --brand-accent-light: 35 85% 80%; /* Light accent color */
+        --brand-accent-muted: 35 85% 50%; /* Muted accent color */
+        --brand-loading: 35 85% 80%; /* Loading state color */
     }
     .dark {
         --background: 25 30% 8%; /* Deep espresso brown */
@@ -98,6 +115,23 @@
         --sidebar-accent-foreground: 30 20% 85%;
         --sidebar-border: 25 20% 15%;
         --sidebar-ring: 30 60% 45%;
+        --tag-primary: 30 25% 90%;
+        --tag-primary-foreground: 25 30% 12%;
+        --tag-primary-border: 30 25% 80%;
+        --tag-accent: 35 35% 85%;
+        --tag-accent-foreground: 25 30% 12%;
+        --tag-accent-border: 35 35% 75%;
+        --badge-background: 35 80% 50%;
+        --badge-foreground: 25 30% 12%;
+        --badge-border: 35 80% 60%;
+        
+        /* Brand theme specific colors */
+        --brand-title: 35 80% 80%; /* Main heading color */
+        --brand-text: 35 75% 70%; /* Secondary text color */
+        --brand-accent: 35 85% 65%; /* Primary accent color */
+        --brand-accent-light: 35 85% 45%; /* Light accent color */
+        --brand-accent-muted: 35 85% 65%; /* Muted accent color */
+        --brand-loading: 35 85% 45%; /* Loading state color */
     }
 }
 

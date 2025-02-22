@@ -5,7 +5,7 @@ import { getCoffeeFiltersByChatId } from '@/lib/db/queries';
 const STOREFRONT_ACCESS_TOKEN = 'cb22191c12785bc8a2dec70a02efc2fb';
 const GRAPHQL_ENDPOINT = 'https://drinktrade.myshopify.com/api/2023-07/graphql.json';
 
-export interface CoffeeProduct {
+export interface Product {
   name: string;
   vendor: string;
   handle: string;
@@ -120,8 +120,8 @@ const buildGraphQLQuery = (filters?: Record<string, string[]>) => {
 };
 
 export interface CoffeeResponse {
-  products: CoffeeProduct[];
-  appliedFilters: Record<string, string[]>;
+  products: Product[];
+  appliedFilters: Record<string, unknown>;
   error?: string;
 }
 
@@ -146,7 +146,7 @@ export async function getCoffeeProducts(chatId: string): Promise<CoffeeResponse>
       throw new Error(data.errors[0].message);
     }
 
-    const products: CoffeeProduct[] = data.data.collection.products.nodes.map((product: any) => ({
+    const products: Product[] = data.data.collection.products.nodes.map((product: any) => ({
       name: product.title,
       handle: product.handle,
       vendor: product.vendor,

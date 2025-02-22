@@ -2,8 +2,9 @@
 
 import type { User } from 'next-auth';
 import { useRouter } from 'next/navigation';
+import { APP_CONFIG } from '@/config/app.config';
 
-import { PlusIcon, CoffeeIcon, MessageIcon } from '@/components/icons';
+import { PlusIcon } from '@/components/icons';
 import { SidebarHistory } from '@/components/sidebar-history';
 import { SidebarUserNav } from '@/components/sidebar-user-nav';
 import { Button } from '@/components/ui/button';
@@ -35,9 +36,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
               className="flex flex-row gap-3 items-center"
             >
               <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer flex items-center gap-1.5 brand-text">
-                <span className="text-xl">Coffee</span>
-                <span className="text-amber-700">+</span>
-                <span className="text-xl">Chat</span>
+                <span className="text-xl">{APP_CONFIG.app.name}</span>
               </span>
             </Link>
             <Tooltip>

@@ -1,12 +1,12 @@
 import { memo, useRef, useEffect } from 'react';
 import { useBlock } from '@/hooks/use-block';
-import { CoffeeProduct } from '@/lib/coffee/coffee-fetcher';
+import { Product } from '@/lib/coffee/coffee-fetcher';
 import { FullscreenIcon } from './icons';
 import { CheckoutBlockMetadata, checkoutBlock } from '@/blocks/checkout/client';
 import { fetcher } from '@/lib/utils';
 
 interface CheckoutSuggestion {
-  product: CoffeeProduct;
+  product: Product;
   appliedFilters: Record<string, unknown>;
   createdAt: string;
 }
@@ -15,7 +15,7 @@ interface CheckoutPreviewProps {
   isReadonly: boolean;
   chatId: string;
   result?: {
-    products: CoffeeProduct[];
+    products: Product[];
     appliedFilters: Record<string, unknown>;
   };
 }

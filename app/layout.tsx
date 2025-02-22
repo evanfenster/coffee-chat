@@ -4,15 +4,18 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ThemeProvider } from '@/components/theme-provider';
 import { initializeKnowledgeBase } from '@/lib/knowledge';
+import { APP_CONFIG } from '@/config/app.config';
 
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://coffee-chat-bay.vercel.app/'),
-  title: 'CoffeeChat',
-  description: 'CoffeeChat is an interactive chatbot that helps you find and purchase new coffee beans.',
+  metadataBase: new URL(APP_CONFIG.app.url),
+  title: APP_CONFIG.app.name,
+  description: APP_CONFIG.app.description,
+  icons: {
+    icon: { url: '/favicon.ico', type: 'image/x-icon' }
+  }
 };
-
 
 export const viewport = {
   maximumScale: 1, // Disable auto-zoom on mobile Safari
@@ -65,8 +68,8 @@ export default function RootLayout({
       <body className="antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <Toaster position="top-center" />

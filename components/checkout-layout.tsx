@@ -2,12 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { EmbeddedCheckoutDialog } from './embedded-checkout';
-import { CoffeeProduct } from '@/lib/coffee/coffee-fetcher';
+import { Product } from '@/lib/coffee/coffee-fetcher';
 
 interface CheckoutLayoutProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
-  product?: CoffeeProduct;
+  product?: Product;
   checkoutOpen: boolean;
   setCheckoutOpen: (open: boolean) => void;
 }

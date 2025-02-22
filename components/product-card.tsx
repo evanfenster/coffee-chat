@@ -6,7 +6,7 @@ import cx from "classnames"
 import Image from 'next/image'
 import { Button } from "./ui/button"
 
-interface CoffeeProduct {
+interface Product {
   name: string
   vendor: string
   handle: string
@@ -23,8 +23,8 @@ interface CoffeeProduct {
   imageUrl?: string
 }
 
-interface CoffeeOptionsResult {
-  products: CoffeeProduct[]
+interface ProductOptionsResult {
+  products: Product[]
   appliedFilters: Record<string, unknown>
   description?: string
   error?: string
@@ -41,12 +41,12 @@ function formatArrayString(value: string | string[]): string[] {
     .filter(Boolean)
 }
 
-export function CoffeeCard({
+export function ProductCard({
   result,
   className,
   onBuyClick,
 }: {
-  result: CoffeeOptionsResult
+  result: ProductOptionsResult
   className?: string
   onBuyClick?: () => void
 }) {
@@ -64,7 +64,7 @@ export function CoffeeCard({
 
   if (!result?.products?.length) {
     return <div className="p-4 text-muted-foreground text-center">
-      {result?.error || "No coffee options found with the specified criteria."}
+      {result?.error || "No options found with the specified criteria."}
     </div>
   }
 
@@ -78,8 +78,8 @@ export function CoffeeCard({
           {imageLoading && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative">
-                <div className="animate-pulse size-8 bg-amber-200/30 dark:bg-amber-700/30 rounded-full" />
-                <Coffee className="absolute inset-0 m-auto size-4 text-amber-500/50 dark:text-amber-400/50" />
+                <div className="animate-pulse size-8 bg-[hsl(var(--brand-loading))] rounded-full opacity-30" />
+                <Coffee className="absolute inset-0 m-auto size-4 text-[hsl(var(--brand-accent))] opacity-50" />
               </div>
             </div>
           )}
@@ -92,7 +92,7 @@ export function CoffeeCard({
           ) : product.imageUrl && (
             <Image
               src={product.imageUrl}
-              alt={`${product.name} coffee`}
+              alt={`${product.name}`}
               className={`size-full object-cover transition-all duration-500 ${
                 imageLoading ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
               }`}
@@ -110,11 +110,11 @@ export function CoffeeCard({
           {/* Enhanced Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <div className="text-sm font-medium text-amber-600 dark:text-amber-400 tracking-wide">
+              <div className="text-sm font-medium text-primary">
                 {product.vendor}
               </div>
               <div className="flex flex-col items-end">
-                <div className="text-lg font-semibold text-amber-600 dark:text-amber-400">
+                <div className="text-lg font-semibold text-primary">
                   {product.price}
                 </div>
                 <div className="text-xs text-muted-foreground font-medium">
@@ -131,18 +131,25 @@ export function CoffeeCard({
               </div>
             )}
             {result.description && (
-              <div className="mt-4 text-muted-foreground leading-relaxed">
-                {result.description}
-              </div>
+              <>
+                <div className="mt-4 flex items-center gap-2 text-xs font-medium">
+                  <div className="px-3 py-1.5 rounded-full bg-[hsl(var(--badge-background))] text-[hsl(var(--badge-foreground))] border border-[hsl(var(--badge-border))]">
+                    ✨ Personalized Recommendation
+                  </div>
+                </div>
+                <div className="mt-2 text-foreground/90 leading-relaxed">
+                  {result.description}
+                </div>
+              </>
             )}
           </div>
 
-          {/* Coffee Details */}
+          {/* Product Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 auto-rows-min">
             {/* Roast Level */}
             {product.roastLevel && (
               <div className="space-y-2 mb-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 flex items-center gap-2">
                   Roast Level
                   <span className="h-px flex-1 bg-border" aria-hidden="true" />
                 </h3>
@@ -150,7 +157,7 @@ export function CoffeeCard({
                   {formatArrayString(product.roastLevel).map((level, index) => (
                     <span 
                       key={index}
-                      className="px-2.5 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-300 text-sm font-medium rounded-full border border-amber-200/50 dark:border-amber-700/50"
+                      className="px-2.5 py-1.5 bg-[hsl(var(--tag-primary))] text-[hsl(var(--tag-primary-foreground))] text-sm font-medium rounded-full border border-[hsl(var(--tag-primary-border))]"
                     >
                       {level} Roast
                     </span>
@@ -162,7 +169,7 @@ export function CoffeeCard({
             {/* Taste Profile */}
             {product.tasteType && (
               <div className="space-y-2 mb-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 flex items-center gap-2">
                   Taste Profile
                   <span className="h-px flex-1 bg-border" aria-hidden="true" />
                 </h3>
@@ -170,7 +177,7 @@ export function CoffeeCard({
                   {formatArrayString(product.tasteType).map((type, index) => (
                     <span 
                       key={index}
-                      className="px-2.5 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-300 text-sm font-medium rounded-full border border-amber-200/50 dark:border-amber-700/50"
+                      className="px-2.5 py-1.5 bg-[hsl(var(--tag-primary))] text-[hsl(var(--tag-primary-foreground))] text-sm font-medium rounded-full border border-[hsl(var(--tag-primary-border))]"
                     >
                       {type}
                     </span>
@@ -182,7 +189,7 @@ export function CoffeeCard({
             {/* Processing Method */}
             {product.process && (
               <div className="space-y-2 mb-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 flex items-center gap-2">
                   Processing Method
                   <span className="h-px flex-1 bg-border" aria-hidden="true" />
                 </h3>
@@ -190,7 +197,7 @@ export function CoffeeCard({
                   {formatArrayString(product.process).map((proc, index) => (
                     <span 
                       key={index}
-                      className="px-2.5 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-300 text-sm font-medium rounded-full border border-amber-200/50 dark:border-amber-700/50"
+                      className="px-2.5 py-1.5 bg-[hsl(var(--tag-primary))] text-[hsl(var(--tag-primary-foreground))] text-sm font-medium rounded-full border border-[hsl(var(--tag-primary-border))]"
                     >
                       {proc}
                     </span>
@@ -202,7 +209,7 @@ export function CoffeeCard({
             {/* Origin */}
             {product.origin && (
               <div className="space-y-2 mb-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 flex items-center gap-2">
                   Origin
                   <span className="h-px flex-1 bg-border" aria-hidden="true" />
                 </h3>
@@ -210,7 +217,7 @@ export function CoffeeCard({
                   {formatArrayString(product.origin).map((orig, index) => (
                     <span 
                       key={index}
-                      className="px-2.5 py-1 bg-orange-50 dark:bg-orange-900/20 text-orange-900 dark:text-orange-300 text-sm font-medium rounded-md border border-orange-200/50 dark:border-orange-800/50"
+                      className="px-2.5 py-1.5 bg-[hsl(var(--tag-accent))] text-[hsl(var(--tag-accent-foreground))] text-sm font-medium rounded-full border border-[hsl(var(--tag-accent-border))]"
                     >
                       {orig}
                     </span>
@@ -222,7 +229,7 @@ export function CoffeeCard({
             {/* Growing Region */}
             {product.region && (
               <div className="space-y-2 mb-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 flex items-center gap-2">
                   Growing Region
                   <span className="h-px flex-1 bg-border" aria-hidden="true" />
                 </h3>
@@ -230,7 +237,7 @@ export function CoffeeCard({
                   {formatArrayString(product.region).map((reg, index) => (
                     <span 
                       key={index}
-                      className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-900 dark:text-emerald-300 text-sm font-medium rounded-md border border-emerald-200/50 dark:border-emerald-800/50"
+                      className="px-2.5 py-1.5 bg-[hsl(var(--tag-accent))] text-[hsl(var(--tag-accent-foreground))] text-sm font-medium rounded-full border border-[hsl(var(--tag-accent-border))]"
                     >
                       {reg}
                     </span>
@@ -242,7 +249,7 @@ export function CoffeeCard({
             {/* Tasting Notes */}
             {product.tastingNotes && product.tastingNotes.length > 0 && (
               <div className="space-y-2 mb-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 flex items-center gap-2">
                   Tasting Notes
                   <span className="h-px flex-1 bg-border" aria-hidden="true" />
                 </h3>
@@ -250,7 +257,7 @@ export function CoffeeCard({
                   {product.tastingNotes.map((note, index) => (
                     <span
                       key={index}
-                      className="px-2.5 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-300 text-sm font-medium rounded-md border border-amber-200/50 dark:border-amber-800/50"
+                      className="px-2.5 py-1.5 bg-[hsl(var(--tag-primary))] text-[hsl(var(--tag-primary-foreground))] text-sm font-medium rounded-full border border-[hsl(var(--tag-primary-border))]"
                     >
                       {note}
                     </span>
@@ -262,7 +269,7 @@ export function CoffeeCard({
             {/* Certifications */}
             {product.certifications && product.certifications.length > 0 && (
               <div className="space-y-2 mb-4 md:col-span-2">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 flex items-center gap-2">
                   Certifications
                   <span className="h-px flex-1 bg-border" aria-hidden="true" />
                 </h3>
@@ -270,7 +277,7 @@ export function CoffeeCard({
                   {product.certifications.map((cert, index) => (
                     <span
                       key={index}
-                      className="px-2.5 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-300 text-sm font-medium rounded-md border border-blue-200/50 dark:border-blue-800/50"
+                      className="px-2.5 py-1.5 bg-[hsl(var(--tag-accent))] text-[hsl(var(--tag-accent-foreground))] text-sm font-medium rounded-full border border-[hsl(var(--tag-accent-border))]"
                     >
                       {formatArrayString(cert)}
                     </span>
@@ -285,7 +292,7 @@ export function CoffeeCard({
             <Button
               type="button"
               onClick={onBuyClick}
-              className="w-full bg-amber-500 text-white hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 relative z-10 h-12 text-lg font-medium"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:hover:bg-primary/80 relative z-10 h-12 text-lg font-medium"
             >
               Buy Now
             </Button>
@@ -294,5 +301,4 @@ export function CoffeeCard({
       </div>
     </div>
   )
-}
-
+} 
