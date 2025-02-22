@@ -52,7 +52,30 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({ cardId: card.id })
+    // Get the full card details including number and CVC
+    const cardDetails = await stripe.issuing.cards.retrieve(
+      card.id,
+      {
+        expand: ['number', 'cvc']
+      }
+    )
+
+    // Get the cardholder details for shipping info
+    const cardholder = await stripe.issuing.cardholders.retrieve(userData.stripeCardHolderId)
+
+    // Return both the card ID and formatted card details
+    return NextResponse.json({
+      cardId: card.id,
+      cardDetails: {
+        number: cardDetails.number,
+        expiry: `${card.exp_month}/${card.exp_year.toString().slice(-2)}`,
+        cvc: cardDetails.cvc,
+        email: cardholder.email,
+        firstName: cardholder.individual?.first_name,
+        lastName: cardholder.individual?.last_name,
+        address: cardholder.billing.address
+      }
+    })
   } catch (error) {
     console.error('Error creating virtual card:', error)
     return NextResponse.json(

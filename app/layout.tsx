@@ -73,7 +73,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <Toaster position="top-center" />
+          <Toaster position="bottom-right" />
           {children}
           <Analytics />
           <SpeedInsights />

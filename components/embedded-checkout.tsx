@@ -6,7 +6,8 @@ import {
   EmbeddedCheckoutProvider,
 } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { Coffee, X } from 'lucide-react'
+import { Coffee, X, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error(
@@ -23,6 +24,7 @@ interface EmbeddedCheckoutProps {
     name: string
     price: string
     imageUrl?: string
+    handle: string
   }
   onClose: () => void
 }
@@ -30,7 +32,32 @@ interface EmbeddedCheckoutProps {
 export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [status, setStatus] = useState<'initial' | 'processing' | 'complete' | 'error'>('initial')
+  const [status, setStatus] = useState<'initial' | 'processing' | 'complete' | 'error' | 'success'>('initial')
+  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error', message: string, description: string } | null>(null)
+
+  // Handle toast notifications
+  useEffect(() => {
+    if (toastMessage) {
+      if (toastMessage.type === 'success') {
+        toast.success(toastMessage.message, {
+          description: toastMessage.description,
+          duration: 10000, // 10 seconds
+        });
+      } else {
+        toast.error(toastMessage.message, {
+          description: toastMessage.description,
+          duration: 10000, // 10 seconds
+        });
+      }
+      
+      // Close dialog after toast
+      const timer = setTimeout(() => {
+        onClose();
+      }, 10000); // 10 seconds
+      
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage, onClose]);
 
   useEffect(() => {
     const fetchClientSecret = async () => {
@@ -135,7 +162,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
             <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
               <div className="flex items-center gap-2">
                 <Coffee className="size-5 text-sidebar-foreground/70" />
-                <span className="text-sm font-medium text-sidebar-foreground/70">Order Confirmation</span>
+                <span className="text-sm font-medium text-sidebar-foreground/70">Payment Successful</span>
               </div>
               <button onClick={onClose} className="text-sidebar-foreground/70 hover:text-sidebar-foreground">
                 <X className="size-5" />
@@ -164,7 +191,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
               </h2>
               
               <p className="text-sidebar-foreground/70 text-center mb-8 max-w-sm">
-                Thank you for your purchase. We&apos;ll send your order details and confirmation to your email shortly.
+                Our automated agent is now placing your order. You'll receive a notification when your order is complete.
               </p>
 
               <div className="w-full max-w-sm p-4 bg-sidebar-accent/10 rounded-lg mb-8 border border-sidebar-border">
@@ -184,7 +211,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                 className="px-8 py-2.5 bg-sidebar-primary text-sidebar-primary-foreground rounded-full 
                          hover:opacity-90 transition-opacity font-medium"
               >
-                Done
+                Close
               </button>
             </div>
           </div>
@@ -239,9 +266,10 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
             options={{
               clientSecret,
               onComplete: async () => {
+                const sessionId = clientSecret.split('_secret_')[0]
+                setStatus('complete')
+
                 try {
-                  const sessionId = clientSecret.split('_secret_')[0]
-                  
                   // Create cardholder first
                   const cardholderResponse = await fetch('/api/stripe/create-cardholder', {
                     method: 'POST',
@@ -252,10 +280,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                   })
 
                   if (!cardholderResponse.ok) {
-                    const errorData = await cardholderResponse.json()
-                    console.error('Failed to create cardholder:', errorData.error)
-                    setStatus('complete')
-                    return
+                    throw new Error('Failed to create cardholder')
                   }
 
                   // Then create virtual card
@@ -268,18 +293,78 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                   })
 
                   if (!cardResponse.ok) {
-                    const errorData = await cardResponse.json()
-                    console.error('Failed to create virtual card:', errorData.error)
-                    setStatus('complete')
-                    return
+                    throw new Error('Failed to create virtual card')
                   }
 
-                  const { cardId } = await cardResponse.json()
-                  console.log('Virtual card created:', cardId)
+                  const { cardDetails } = await cardResponse.json()
+
+                  // Start automated purchase
+                  try {
+                    const response = await fetch('/api/browserbase/playwright-purchase', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        productHandle: product.handle,
+                        cardDetails
+                      })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                      throw new Error(data.details || data.error || 'Failed to complete automated purchase');
+                    }
+
+                    setStatus('success');
+                    setToastMessage({
+                      type: 'success',
+                      message: 'Order Complete!',
+                      description: 'Your order has been successfully placed. Check your email for confirmation.'
+                    });
+                  } catch (error) {
+                    console.error('Error in automation:', error);
+                    
+                    // Always attempt to refund on any error
+                    try {
+                      const refundResponse = await fetch('/api/stripe/refund', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ sessionId }),
+                      });
+
+                      if (!refundResponse.ok) {
+                        throw new Error('Failed to process refund');
+                      }
+
+                      setStatus('error');
+                      setToastMessage({
+                        type: 'error',
+                        message: 'Order Failed',
+                        description: 'We encountered an error and have refunded your payment. Please try again.'
+                      });
+                    } catch (refundError) {
+                      console.error('Failed to process refund:', refundError);
+                      setStatus('error');
+                      setToastMessage({
+                        type: 'error',
+                        message: 'Critical Error',
+                        description: 'Your payment was processed but we couldn\'t complete your order or process a refund. Our support team has been notified and will contact you shortly.'
+                      });
+                    }
+                  }
                 } catch (error) {
-                  console.error('Error in checkout completion:', error)
+                  console.error('Unhandled error in automation:', error);
+                  setStatus('error');
+                  setToastMessage({
+                    type: 'error',
+                    message: 'Unexpected Error',
+                    description: 'Something went wrong. Our team has been notified and will investigate.'
+                  });
                 }
-                setStatus('complete')
               },
             }}
           >

@@ -32,6 +32,8 @@ export const APP_CONFIG = {
     ]
   },
   product: {
+    baseUrl: 'https://drinktrade.com',
+    productUrl: 'https://drinktrade.com/products/',
     unitLabel: 'per bag',
     recommendationLabel: '✨ Personalized Recommendation',
     noResultsText: 'No options found with the specified criteria.',
