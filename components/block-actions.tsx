@@ -47,7 +47,7 @@ function PureBlockActions({
 
   return (
     <div className="flex flex-row gap-1">
-      {blockDefinition.actions.map((action) => (
+      {blockDefinition.actions?.map((action) => (
         <Tooltip key={action.description}>
           <TooltipTrigger asChild>
             <Button

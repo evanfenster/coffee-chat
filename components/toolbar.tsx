@@ -382,12 +382,12 @@ const PureToolbar = ({
   );
 
   if (!blockDefinition) {
-    throw new Error('Block definition not found!');
+    return null;
   }
 
   const toolsByBlockKind = blockDefinition.toolbar;
 
-  if (toolsByBlockKind.length === 0) {
+  if (!toolsByBlockKind || toolsByBlockKind.length === 0) {
     return null;
   }
 

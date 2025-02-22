@@ -77,7 +77,7 @@ export const document = pgTable(
     createdAt: timestamp('createdAt').notNull(),
     title: text('title').notNull(),
     content: text('content'),
-    kind: varchar('text', { enum: ['text', 'code', 'image', 'sheet'] })
+    kind: varchar('text', { enum: ['text', 'checkout'] })
       .notNull()
       .default('text'),
     userId: uuid('userId')
@@ -129,6 +129,19 @@ export const coffeeFilters = pgTable('coffeefilters', {
 });
 
 export type CoffeeFilters = InferSelectModel<typeof coffeeFilters>;
+
+export const checkoutSuggestion = pgTable('CheckoutSuggestion', {
+  id: uuid('id').notNull().defaultRandom().primaryKey(),
+  chatId: uuid('chatId')
+    .notNull()
+    .references(() => chat.id),
+  product: json('product').notNull(),
+  appliedFilters: json('appliedFilters').notNull(),
+  description: text('description').notNull().default(''),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+});
+
+export type CheckoutSuggestion = InferSelectModel<typeof checkoutSuggestion>;
 
 export const knowledgeResource = pgTable('KnowledgeResource', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),

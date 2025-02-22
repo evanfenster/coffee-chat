@@ -17,14 +17,14 @@ import {
 import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
-import { CoffeeCard } from './coffee-card';
-import equal from 'fast-deep-equal';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
+import { CheckoutPreview } from './checkout-preview';
+import equal from 'fast-deep-equal';
 
 const PurePreviewMessage = ({
   chatId,
@@ -165,12 +165,15 @@ const PurePreviewMessage = ({
                             isReadonly={isReadonly}
                           />
                         ) : toolName === 'suggestCoffee' ? (
-                          <CoffeeCard result={result} />
+                          <CheckoutPreview 
+                            result={{
+                              products: result.products,
+                              appliedFilters: result.appliedFilters
+                            }}
+                            chatId={chatId}
+                            isReadonly={isReadonly} 
+                          />
                         ) : null}
-                        {/* Fallback JSON display for tools without explicit UI components
-                        : (
-                          <pre>{JSON.stringify(result, null, 2)}</pre>
-                        )*/}
                       </div>
                     );
                   }
@@ -196,7 +199,7 @@ const PurePreviewMessage = ({
                           isReadonly={isReadonly}
                         />
                       ) : toolName === 'suggestCoffee' ? (
-                        <CoffeeCard result={{ products: [], appliedFilters: {} }} />
+                        <CheckoutPreview result={{ products: [], appliedFilters: {} }} chatId={chatId} isReadonly={isReadonly} />
                       ) : null}
                     </div>
                   );

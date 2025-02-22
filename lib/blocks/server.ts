@@ -1,7 +1,5 @@
-import { codeDocumentHandler } from '@/blocks/code/server';
-import { imageDocumentHandler } from '@/blocks/image/server';
-import { sheetDocumentHandler } from '@/blocks/sheet/server';
 import { textDocumentHandler } from '@/blocks/text/server';
+import { checkoutDocumentHandler } from '@/blocks/checkout/server';
 import { BlockKind } from '@/components/block';
 import { DataStreamWriter } from 'ai';
 import { Document } from '../db/schema';
@@ -91,10 +89,7 @@ export function createDocumentHandler<T extends BlockKind>(config: {
  */
 export const documentHandlersByBlockKind: Array<DocumentHandler> = [
   textDocumentHandler,
-  //codeDocumentHandler,
-  imageDocumentHandler,
-  sheetDocumentHandler,
+  checkoutDocumentHandler,
 ];
 
-//export const blockKinds = ['text', 'code', 'image', 'sheet'] as const;
-export const blockKinds = ['sheet'] as const;
+export const blockKinds = ['text', 'checkout'] as const

@@ -34,7 +34,7 @@ export const textBlock = new Block<'text', TextBlockMetadata>({
         return {
           suggestions: [
             ...metadata.suggestions,
-            streamPart.content as Suggestion,
+            JSON.parse(streamPart.content as string) as Suggestion,
           ],
         };
       });

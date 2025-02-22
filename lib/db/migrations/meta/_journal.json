@@ -71,6 +71,34 @@
       "when": 1740115468520,
       "tag": "0009_volatile_mole_man",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1740171913729,
+      "tag": "0010_wooden_next_avengers",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1740188565357,
+      "tag": "0011_fat_doomsday",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1740188619646,
+      "tag": "0012_goofy_the_liberteens",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1740188781747,
+      "tag": "0013_bouncy_butterfly",
+      "breakpoints": true
     }
   ]
 }

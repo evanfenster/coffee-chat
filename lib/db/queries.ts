@@ -16,6 +16,8 @@ import {
   message,
   vote,
   coffeeFilters,
+  checkoutSuggestion,
+  type CheckoutSuggestion,
 } from './schema';
 import { BlockKind } from '@/components/block';
 import { CoffeeFilters } from '@/lib/coffee/coffee-fetcher';
@@ -436,6 +438,50 @@ export async function clearCoffeeFilters({
       .where(eq(coffeeFilters.chatId, chatId));
   } catch (error) {
     console.error('Failed to clear coffee filters in database');
+    throw error;
+  }
+}
+
+export async function saveCheckoutSuggestion({ 
+  chatId,
+  product,
+  appliedFilters,
+  description,
+}: { 
+  chatId: string;
+  product: unknown;
+  appliedFilters: unknown;
+  description: string;
+}): Promise<void> {
+  try {
+    await db
+      .insert(checkoutSuggestion)
+      .values({
+        chatId,
+        product,
+        appliedFilters,
+        description,
+        createdAt: new Date(),
+      });
+  } catch (error) {
+    console.error('Failed to save checkout suggestion to database');
+    throw error;
+  }
+}
+
+export async function getCheckoutSuggestionsByChatId({ 
+  chatId 
+}: { 
+  chatId: string 
+}): Promise<CheckoutSuggestion[]> {
+  try {
+    return await db
+      .select()
+      .from(checkoutSuggestion)
+      .where(eq(checkoutSuggestion.chatId, chatId))
+      .orderBy(desc(checkoutSuggestion.createdAt));
+  } catch (error) {
+    console.error('Failed to get checkout suggestions from database');
     throw error;
   }
 }

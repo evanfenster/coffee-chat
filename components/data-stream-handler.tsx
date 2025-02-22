@@ -9,16 +9,14 @@ import { initialBlockData, useBlock } from '@/hooks/use-block';
 export type DataStreamDelta = {
   type:
     | 'text-delta'
-    | 'code-delta'
-    | 'sheet-delta'
-    | 'image-delta'
     | 'title'
     | 'id'
     | 'suggestion'
     | 'clear'
     | 'finish'
-    | 'kind';
-  content: string | Suggestion;
+    | 'kind'
+    | 'block';
+  content: string;
 };
 
 export function DataStreamHandler({ id }: { id: string }) {

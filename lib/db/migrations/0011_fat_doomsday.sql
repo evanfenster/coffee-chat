@@ -1,0 +1,1 @@
+ALTER TABLE "CheckoutSuggestion" ADD COLUMN "description" text NOT NULL;

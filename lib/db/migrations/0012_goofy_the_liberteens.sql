@@ -1,0 +1,1 @@
+ALTER TABLE "CheckoutSuggestion" ALTER COLUMN "description" SET DEFAULT '';

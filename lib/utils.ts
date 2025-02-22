@@ -20,7 +20,7 @@ interface ApplicationError extends Error {
   status: number;
 }
 
-export const fetcher = async (url: string) => {
+export const fetcher = async <T = any>(url: string): Promise<T> => {
   const res = await fetch(url);
 
   if (!res.ok) {

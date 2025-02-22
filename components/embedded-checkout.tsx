@@ -62,30 +62,35 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
 
   if (error) {
     return (
-      <div className="rounded-lg p-4 bg-red-50">
-        <p className="text-sm text-red-500">Could not load checkout. Please try again.</p>
+      <div className="bg-white rounded-xl p-6 border border-red-100">
+        <div className="flex items-center gap-3 text-red-600 mb-2">
+          <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 className="font-medium">Checkout Error</h3>
+        </div>
+        <p className="text-sm text-red-600">Could not load checkout. Please try again.</p>
       </div>
     )
   }
 
   if (status === 'complete') {
     return (
-      <div className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-md border border-emerald-100">
+      <div className="bg-white rounded-xl p-8 border border-emerald-100">
         <div className="flex flex-col items-center text-center">
-          <div className="size-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-            <svg className="size-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="size-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+            <svg className="size-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-green-800 mb-2">Payment Successful!</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-xl font-bold text-emerald-800 mb-2">Payment Successful!</h2>
+          <p className="text-stone-600 mb-6">
             Thank you for your purchase. We&apos;ll send your coffee details and confirmation to your email shortly.
           </p>
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-white text-green-700 rounded-full hover:bg-green-50 
-                     border border-green-200 transition-colors duration-200 
-                     font-medium shadow-sm hover:shadow-md"
+            className="px-6 py-2 bg-emerald-50 text-emerald-700 rounded-full hover:bg-emerald-100 
+                     transition-colors duration-200 font-medium"
           >
             Done
           </button>
@@ -96,21 +101,24 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
 
   if (!clientSecret) {
     return (
-      <div className="p-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-          <div className="space-y-2">
-            <div className="h-4 bg-slate-200 rounded"></div>
-            <div className="h-4 bg-slate-200 rounded w-5/6"></div>
+      <div className="bg-white rounded-xl p-6">
+        <div className="animate-pulse space-y-6">
+          <div className="h-4 bg-stone-100 rounded w-3/4"></div>
+          <div className="space-y-3">
+            <div className="h-4 bg-stone-100 rounded"></div>
+            <div className="h-4 bg-stone-100 rounded w-5/6"></div>
           </div>
-          <div className="h-10 bg-slate-200 rounded w-1/4"></div>
+          <div className="h-10 bg-stone-100 rounded w-1/4"></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="p-4">
+    <div className="bg-white rounded-xl overflow-hidden">
+      <div className="border-b border-stone-200 p-4">
+        <h3 className="font-medium text-stone-900">Complete Purchase</h3>
+      </div>
       <EmbeddedCheckoutProvider
         stripe={stripePromise}
         options={{
@@ -160,7 +168,9 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
           },
         }}
       >
-        <EmbeddedCheckout />
+        <div className="p-4">
+          <EmbeddedCheckout />
+        </div>
       </EmbeddedCheckoutProvider>
     </div>
   )

@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+import { OpenAI } from 'openai';
 import { db } from '../db/queries';
 import { knowledgeEmbedding } from '../db/schema';
 import { cosineDistance, desc, gt, sql } from 'drizzle-orm';

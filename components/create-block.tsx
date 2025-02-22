@@ -1,7 +1,6 @@
 import { Suggestion } from '@/lib/db/schema';
 import { UseChatHelpers } from 'ai/react';
-import { ComponentType, Dispatch, ReactNode, SetStateAction } from 'react';
-import { DataStreamDelta } from './data-stream-handler';
+import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { UIBlock } from './block';
 
 export type BlockActionContext<M = any> = {
@@ -48,45 +47,72 @@ interface BlockContent<M = any> {
   setMetadata: Dispatch<SetStateAction<M>>;
 }
 
-interface InitializeParameters<M = any> {
+export type StreamPartType =
+  | 'text-delta'
+  | 'title'
+  | 'id'
+  | 'suggestion'
+  | 'clear'
+  | 'finish'
+  | 'kind'
+  | 'block';
+
+export interface StreamPart {
+  type: StreamPartType;
+  content: string;
+}
+
+export interface InitializeParameters<M = any> {
   documentId: string;
   setMetadata: Dispatch<SetStateAction<M>>;
 }
 
-type BlockConfig<T extends string, M = any> = {
-  kind: T;
+export interface StreamPartParameters<M = any> {
+  streamPart: StreamPart;
+  setMetadata: Dispatch<SetStateAction<M>>;
+  setBlock: Dispatch<SetStateAction<UIBlock>>;
+}
+
+export interface ContentParameters<M = any> {
+  title: string;
+  content: string;
+  mode: 'edit' | 'diff';
+  status: 'streaming' | 'idle';
+  currentVersionIndex: number;
+  suggestions: Array<any>;
+  onSaveContent: (content: string, debounce: boolean) => void;
+  isInline: boolean;
+  isCurrentVersion: boolean;
+  getDocumentContentById: (index: number) => string;
+  isLoading: boolean;
+  metadata: M;
+  setMetadata: Dispatch<SetStateAction<M>>;
+}
+
+export class Block<K extends string, M = any> {
+  kind: K;
   description: string;
-  content: ComponentType<BlockContent<M>>;
-  actions: Array<BlockAction<M>>;
-  toolbar: BlockToolbarItem[];
-  initialize?: (parameters: InitializeParameters<M>) => void;
-  onStreamPart: (args: {
-    setMetadata: Dispatch<SetStateAction<M>>;
-    setBlock: Dispatch<SetStateAction<UIBlock>>;
-    streamPart: DataStreamDelta;
-  }) => void;
-};
+  initialize?: (params: InitializeParameters<M>) => Promise<void>;
+  onStreamPart?: (params: StreamPartParameters<M>) => void;
+  content: (params: ContentParameters<M>) => JSX.Element;
+  actions?: Array<BlockAction<M>>;
+  toolbar?: Array<BlockToolbarItem>;
 
-export class Block<T extends string, M = any> {
-  readonly kind: T;
-  readonly description: string;
-  readonly content: ComponentType<BlockContent<M>>;
-  readonly actions: Array<BlockAction<M>>;
-  readonly toolbar: BlockToolbarItem[];
-  readonly initialize?: (parameters: InitializeParameters) => void;
-  readonly onStreamPart: (args: {
-    setMetadata: Dispatch<SetStateAction<M>>;
-    setBlock: Dispatch<SetStateAction<UIBlock>>;
-    streamPart: DataStreamDelta;
-  }) => void;
-
-  constructor(config: BlockConfig<T, M>) {
+  constructor(config: {
+    kind: K;
+    description: string;
+    initialize?: (params: InitializeParameters<M>) => Promise<void>;
+    onStreamPart?: (params: StreamPartParameters<M>) => void;
+    content: (params: ContentParameters<M>) => JSX.Element;
+    actions?: Array<BlockAction<M>>;
+    toolbar?: Array<BlockToolbarItem>;
+  }) {
     this.kind = config.kind;
     this.description = config.description;
-    this.content = config.content;
-    this.actions = config.actions || [];
-    this.toolbar = config.toolbar || [];
-    this.initialize = config.initialize || (async () => ({}));
+    this.initialize = config.initialize;
     this.onStreamPart = config.onStreamPart;
+    this.content = config.content;
+    this.actions = config.actions;
+    this.toolbar = config.toolbar;
   }
 }

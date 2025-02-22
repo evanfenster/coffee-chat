@@ -100,7 +100,7 @@ export async function POST(request: Request) {
               session,
               dataStream,
             }),
-            suggestCoffee: createSuggestCoffeeTool(id),
+            suggestCoffee: createSuggestCoffeeTool(id, dataStream, session?.user?.id),
             getCoffeeFilters: createGetCoffeeFiltersTool(id),
             editCoffeeFilters: createEditCoffeeFiltersTool(id),
             clearCoffeeFilters: createClearCoffeeFiltersTool(id),

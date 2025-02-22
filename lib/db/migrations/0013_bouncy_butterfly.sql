@@ -1,0 +1,1 @@
+ALTER TABLE "CheckoutSuggestion" ADD PRIMARY KEY ("id");

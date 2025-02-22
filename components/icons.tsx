@@ -1173,3 +1173,37 @@ export const CoffeeIcon = ({ size = 16, className }: { size?: number, className?
     <line x1="14" y1="1" x2="14" y2="4" />
   </svg>
 );
+
+export const ChevronLeftIcon = ({ size = 16 }: { size?: number }) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    viewBox="0 0 16 16"
+    width={size}
+    style={{ color: 'currentcolor' }}
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M9.25001 12.0607L8.71968 11.5303L5.89646 8.7071C5.50593 8.31657 5.50593 7.68341 5.89646 7.29288L8.71968 4.46966L9.25001 3.93933L10.3107 4.99999L9.78034 5.53032L7.31067 7.99999L9.78034 10.4697L10.3107 11L9.25001 12.0607Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
+export const ChevronRightIcon = ({ size = 16 }: { size?: number }) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    viewBox="0 0 16 16"
+    width={size}
+    style={{ color: 'currentcolor' }}
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M6.74999 12.0607L7.28032 11.5303L10.1035 8.7071C10.4941 8.31657 10.4941 7.68341 10.1035 7.29288L7.28032 4.46966L6.74999 3.93933L5.68933 4.99999L6.21966 5.53032L8.68933 7.99999L6.21966 10.4697L5.68933 11L6.74999 12.0607Z"
+      fill="currentColor"
+    />
+  </svg>
+);

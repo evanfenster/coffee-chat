@@ -17,7 +17,7 @@ import {
 import useSWR, { useSWRConfig } from 'swr';
 import { useDebounceCallback, useWindowSize } from 'usehooks-ts';
 import type { Document, Vote } from '@/lib/db/schema';
-import { fetcher } from '@/lib/utils';
+import { cn, fetcher } from '@/lib/utils';
 import { MultimodalInput } from './multimodal-input';
 import { Toolbar } from './toolbar';
 import { VersionFooter } from './version-footer';
@@ -26,17 +26,22 @@ import { BlockCloseButton } from './block-close-button';
 import { BlockMessages } from './block-messages';
 import { useSidebar } from './ui/sidebar';
 import { useBlock } from '@/hooks/use-block';
-import { imageBlock } from '@/blocks/image/client';
-import { codeBlock } from '@/blocks/code/client';
-import { sheetBlock } from '@/blocks/sheet/client';
 import { textBlock } from '@/blocks/text/client';
+import { checkoutBlock } from '@/blocks/checkout/client';
+import type { CheckoutBlockMetadata } from '@/blocks/checkout/client';
 import equal from 'fast-deep-equal';
 
-export const blockDefinitions = [textBlock, codeBlock, imageBlock, sheetBlock];
-export type BlockKind = (typeof blockDefinitions)[number]['kind'];
+export const blockDefinitions = [textBlock, checkoutBlock];
+export type BlockKind = "text" | "checkout";
+
+export interface BlockMetadata {
+  text: Record<string, never>;
+  checkout: CheckoutBlockMetadata;
+}
 
 export interface UIBlock {
   title: string;
+  subtitle?: string;
   documentId: string;
   kind: BlockKind;
   content: string;
@@ -98,7 +103,7 @@ function PureBlock({
     isLoading: isDocumentsFetching,
     mutate: mutateDocuments,
   } = useSWR<Array<Document>>(
-    block.documentId !== 'init' && block.status !== 'streaming'
+    block.documentId !== 'init' && block.status !== 'streaming' && block.kind !== 'checkout'
       ? `/api/document?id=${block.documentId}`
       : null,
     fetcher,
@@ -286,7 +291,10 @@ function PureBlock({
 
           {!isMobile && (
             <motion.div
-              className="relative w-[400px] bg-muted dark:bg-background h-dvh shrink-0"
+              className={cn(
+                "relative bg-muted dark:bg-background h-dvh shrink-0",
+                block.kind === 'checkout' ? "w-[600px]" : "w-[400px]"
+              )}
               initial={{ opacity: 0, x: 10, scale: 1 }}
               animate={{
                 opacity: 1,
@@ -350,7 +358,7 @@ function PureBlock({
           )}
 
           <motion.div
-            className="fixed dark:bg-muted bg-background h-dvh flex flex-col overflow-y-scroll md:border-l dark:border-zinc-700 border-zinc-200"
+            className="fixed dark:bg-muted bg-background h-dvh flex flex-col md:border-l dark:border-zinc-700 border-zinc-200"
             initial={
               isMobile
                 ? {
@@ -389,12 +397,12 @@ function PureBlock({
                   }
                 : {
                     opacity: 1,
-                    x: 400,
+                    x: block.kind === 'checkout' ? 600 : 400,
                     y: 0,
                     height: windowHeight,
                     width: windowWidth
-                      ? windowWidth - 400
-                      : 'calc(100dvw-400px)',
+                      ? windowWidth - (block.kind === 'checkout' ? 600 : 400)
+                      : `calc(100dvw-${block.kind === 'checkout' ? '600px' : '400px'})`,
                     borderRadius: 0,
                     transition: {
                       delay: 0,
@@ -421,24 +429,29 @@ function PureBlock({
                 <BlockCloseButton />
 
                 <div className="flex flex-col">
-                  <div className="font-medium">{block.title}</div>
+                  <div className={cn(
+                    "font-medium",
+                    block.kind === 'checkout' && "py-1.5"
+                  )}>{block.title}</div>
 
-                  {isContentDirty ? (
-                    <div className="text-sm text-muted-foreground">
-                      Saving changes...
-                    </div>
-                  ) : document ? (
-                    <div className="text-sm text-muted-foreground">
-                      {`Updated ${formatDistance(
-                        new Date(document.createdAt),
-                        new Date(),
-                        {
-                          addSuffix: true,
-                        },
-                      )}`}
-                    </div>
-                  ) : (
-                    <div className="w-32 h-3 mt-2 bg-muted-foreground/20 rounded-md animate-pulse" />
+                  {block.kind !== 'checkout' && (
+                    isContentDirty ? (
+                      <div className="text-sm text-muted-foreground">
+                        Saving changes...
+                      </div>
+                    ) : document ? (
+                      <div className="text-sm text-muted-foreground">
+                        {`Updated ${formatDistance(
+                          new Date(document.createdAt),
+                          new Date(),
+                          {
+                            addSuffix: true,
+                          },
+                        )}`}
+                      </div>
+                    ) : (
+                      <div className="w-32 h-3 mt-2 bg-muted-foreground/20 rounded-md animate-pulse" />
+                    )
                   )}
                 </div>
               </div>
@@ -454,7 +467,7 @@ function PureBlock({
               />
             </div>
 
-            <div className="dark:bg-muted bg-background h-full overflow-y-scroll !max-w-full items-center">
+            <div className="dark:bg-muted bg-background flex-1 overflow-y-auto !max-w-full items-center">
               <blockDefinition.content
                 title={block.title}
                 content={
