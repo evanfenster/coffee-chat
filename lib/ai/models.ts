@@ -5,6 +5,7 @@ import {
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from 'ai';
+import { APP_CONFIG } from '@/config/app.config';
 
 export const DEFAULT_CHAT_MODEL: string = 'chat-model-small';
 
@@ -34,13 +35,13 @@ interface ChatModel {
 export const chatModels: Array<ChatModel> = [
   {
     id: 'chat-model-small',
-    name: 'Quick Chat',
-    description: 'Quick coffee recommendations and simple brewing questions',
+    name: APP_CONFIG.models.quick.name,
+    description: APP_CONFIG.models.quick.description,
   },
   {
     id: 'chat-model-large',
-    name: 'Coffee Connoisseur',
-    description: 'Expert coffee analysis and complex brewing insights',
+    name: APP_CONFIG.models.expert.name,
+    description: APP_CONFIG.models.expert.description,
   },
   // {
   //   id: 'chat-model-reasoning',

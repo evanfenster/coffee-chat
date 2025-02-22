@@ -164,7 +164,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
               </h2>
               
               <p className="text-sidebar-foreground/70 text-center mb-8 max-w-sm">
-                Thank you for your purchase. We'll send your coffee details and confirmation to your email shortly.
+                Thank you for your purchase. We&apos;ll send your order details and confirmation to your email shortly.
               </p>
 
               <div className="w-full max-w-sm p-4 bg-sidebar-accent/10 rounded-lg mb-8 border border-sidebar-border">

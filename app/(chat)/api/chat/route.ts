@@ -75,7 +75,7 @@ export async function POST(request: Request) {
         console.log('📝 [route] Setting up stream with tools');
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel }),
+          system: systemPrompt,
           messages,
           maxSteps: 5,
           experimental_activeTools:
@@ -141,6 +141,7 @@ export async function POST(request: Request) {
         });
       },
       onError: (error) => {
+        // Log and handle errors
         console.error('🔴 [route] Error in data stream:', error);
         return 'Oops, an error occurred!';
       },

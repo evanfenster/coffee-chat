@@ -106,7 +106,7 @@ export function ProductCard({
         </div>
 
         {/* Content Section */}
-        <div className="relative bg-card/95 backdrop-blur-sm p-8 md:p-10 lg:p-12">
+        <div className="relative p-8 md:p-10 lg:p-12">
           {/* Enhanced Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">

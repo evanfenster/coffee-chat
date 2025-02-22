@@ -70,9 +70,9 @@
         --tag-accent: 30 35% 25%;
         --tag-accent-foreground: 40 30% 98%;
         --tag-accent-border: 30 35% 35%;
-        --badge-background: 25 70% 45%;
-        --badge-foreground: 40 30% 98%;
-        --badge-border: 25 70% 55%;
+        --badge-background: 25 30% 25%;          /* Rich leather brown */
+        --badge-foreground: 40 30% 98%;          /* Light cream text */
+        --badge-border: 25 35% 30%;              /* Slightly lighter leather border */
         
         /* Brand theme specific colors */
         --brand-title: 35 80% 25%; /* Main heading color */
@@ -83,56 +83,76 @@
         --brand-loading: 35 85% 80%; /* Loading state color */
     }
     .dark {
-        --background: 25 30% 8%; /* Deep espresso brown */
-        --foreground: 30 25% 90%; /* Creamy off-white */
-        --card: 25 30% 8%;
-        --card-foreground: 30 25% 90%;
-        --popover: 25 30% 8%;
-        --popover-foreground: 30 25% 90%;
-        --primary: 30 25% 90%; /* Creamy white */
-        --primary-foreground: 25 30% 8%;
-        --secondary: 25 20% 15%; /* Darker coffee brown */
-        --secondary-foreground: 30 25% 90%;
-        --muted: 25 20% 15%;
-        --muted-foreground: 30 15% 70%; /* Muted cream */
-        --accent: 20 25% 20%; /* Rich coffee accent */
-        --accent-foreground: 30 25% 90%;
-        --destructive: 0 65% 35%; /* Darker red */
-        --destructive-foreground: 30 25% 90%;
-        --border: 25 20% 15%;
-        --input: 25 20% 15%;
-        --ring: 30 15% 70%;
-        --chart-1: 25 70% 45%; /* Coffee brown */
-        --chart-2: 35 65% 55%; /* Caramel */
-        --chart-3: 15 60% 35%; /* Dark roast */
-        --chart-4: 40 70% 65%; /* Light roast */
-        --chart-5: 20 55% 40%; /* Medium roast */
-        --sidebar-background: 25 25% 12%; /* Slightly lighter espresso */
-        --sidebar-foreground: 30 20% 85%;
-        --sidebar-primary: 30 60% 45%; /* Warm coffee highlight */
-        --sidebar-primary-foreground: 30 25% 90%;
-        --sidebar-accent: 25 20% 15%;
-        --sidebar-accent-foreground: 30 20% 85%;
-        --sidebar-border: 25 20% 15%;
-        --sidebar-ring: 30 60% 45%;
-        --tag-primary: 30 25% 90%;
-        --tag-primary-foreground: 25 30% 12%;
-        --tag-primary-border: 30 25% 80%;
-        --tag-accent: 35 35% 85%;
-        --tag-accent-foreground: 25 30% 12%;
-        --tag-accent-border: 35 35% 75%;
-        --badge-background: 35 80% 50%;
-        --badge-foreground: 25 30% 12%;
-        --badge-border: 35 80% 60%;
-        
-        /* Brand theme specific colors */
-        --brand-title: 35 80% 80%; /* Main heading color */
-        --brand-text: 35 75% 70%; /* Secondary text color */
-        --brand-accent: 35 85% 65%; /* Primary accent color */
-        --brand-accent-light: 35 85% 45%; /* Light accent color */
-        --brand-accent-muted: 35 85% 65%; /* Muted accent color */
-        --brand-loading: 35 85% 45%; /* Loading state color */
-    }
+        /* Base Colors */
+        --background: 0 0% 5%;              /* Nearly black */
+        --foreground: 40 45% 95%;           /* Brighter creamy off-white for better contrast */
+      
+        /* Cards & Popovers */
+        --card: 0 0% 10%;                   /* Slightly lighter than background for separation */
+        --card-foreground: 40 45% 95%;
+        --popover: 0 0% 10%;
+        --popover-foreground: 40 45% 95%;
+      
+        /* Primary & Secondary Elements */
+        --primary: 40 45% 95%;              /* Creamy white for primary actions */
+        --primary-foreground: 0 0% 5%;      /* Ensures text on primary is readable */
+        --secondary: 25 55% 20%;            /* Espresso accent (slightly lighter for better legibility) */
+        --secondary-foreground: 40 45% 95%;
+      
+        /* Muted & Accent Styles */
+        --muted: 0 0% 8%;                   /* Dark, nearly black muted tone */
+        --muted-foreground: 40 35% 80%;     /* Subtle cream */
+        --accent: 25 55% 20%;               /* Warm espresso accent */
+        --accent-foreground: 40 45% 95%;
+      
+        /* Destructive (Error) States */
+        --destructive: 0 65% 40%;           /* Dark red for warnings/errors */
+        --destructive-foreground: 40 45% 95%;
+      
+        /* Borders, Inputs & Rings */
+        --border: 0 0% 12%;                 /* Slightly lighter than card to outline elements */
+        --input: 0 0% 12%;
+        --ring: 40 30% 85%;                 /* Subtle highlight around focus states */
+      
+        /* Chart Colors (Various coffee roasts) */
+        --chart-1: 25 55% 20%;              /* Espresso */
+        --chart-2: 30 60% 25%;              /* Caramel hint */
+        --chart-3: 15 60% 10%;              /* Dark roast */
+        --chart-4: 40 70% 30%;              /* Light roast */
+        --chart-5: 20 55% 15%;              /* Medium roast */
+      
+        /* Sidebar Styles */
+        --sidebar-background: 0 0% 8%;      /* Nearly black but distinct from main background */
+        --sidebar-foreground: 40 45% 95%;
+        --sidebar-primary: 25 55% 20%;      /* Espresso accent for key sidebar items */
+        --sidebar-primary-foreground: 40 45% 95%;
+        --sidebar-accent: 0 0% 10%;
+        --sidebar-accent-foreground: 40 45% 95%;
+        --sidebar-border: 0 0% 12%;
+        --sidebar-ring: 25 55% 20%;
+      
+        /* Tag Styles */
+        --tag-primary: 40 45% 95%;              /* Creamy off-white background */
+        --tag-primary-foreground: 0 0% 5%;        /* Deep black text for high contrast */
+        --tag-primary-border: 0 0% 12%;           /* Subtle, nearly black border */
+
+        --tag-accent: 25 55% 75%;               /* Lightened espresso accent (a soft caramel tone) */
+        --tag-accent-foreground: 0 0% 5%;         /* Pure black text for readability */
+        --tag-accent-border: 25 55% 65%;         /* A slightly darker border to frame the accent */
+
+        /* Badge Styles */
+        --badge-background: 25 30% 25%;          /* Rich leather brown */
+        --badge-foreground: 40 30% 98%;          /* Light cream text */
+        --badge-border: 25 35% 30%;              /* Slightly lighter leather border */
+
+        /* Brand Theme Specific Colors */
+        --brand-title: 40 45% 95%;          /* Headings in bright, creamy off-white */
+        --brand-text: 40 40% 85%;           /* Slightly dimmer for secondary text */
+        --brand-accent: 25 55% 20%;         /* Espresso accent */
+        --brand-accent-light: 25 55% 25%;   /* Slightly lighter accent for hover/active states */
+        --brand-accent-muted: 25 55% 20%;
+        --brand-loading: 25 55% 25%;        /* Light espresso for loading states */
+      }
 }
 
 @layer base {

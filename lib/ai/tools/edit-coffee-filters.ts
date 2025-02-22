@@ -30,16 +30,27 @@ function findCategory(value: string): string | null {
 }
 
 // Constants for suggestion logic
-const IDEAL_SUGGESTION_THRESHOLD = 10; // Suggest when we have 10 or fewer matching coffees
-const MIN_FILTERS_FOR_SUGGESTION = 2; // Need at least 2 filters before making suggestions
+const IDEAL_SUGGESTION_THRESHOLD = 20; // Suggest when we have 20 or fewer matching coffees
+const MIN_FILTERS_FOR_SUGGESTION = 3; // Need at least 3 filters before making suggestions
 
 export const createEditCoffeeFiltersTool = (chatId: string) => tool({
   description: 'Update coffee preferences by adding or removing specific filters based on user interactions and expressed preferences. When this tool returns shouldSuggest: true in its response, you should immediately follow up with a call to suggestCoffee to get a recommendation based on the updated filters.',
   parameters: z.object({
-    edits: z.array(z.object({
+    edits: z.preprocess((val) => {
+      // Filter out any edits with invalid values before validation
+      const edits = Array.isArray(val) ? val : [];
+      return edits.filter((edit: any) => {
+        if (!edit?.value || !edit?.action) return false;
+        const isValid = allValues.includes(edit.value as any);
+        if (!isValid) {
+          console.log('⚠️ [editCoffeeFilters] Filtering out invalid value:', edit.value);
+        }
+        return isValid;
+      });
+    }, z.array(z.object({
       action: z.enum(['add', 'remove']),
       value: z.enum(allValues)
-    }))
+    })))
   }),
   execute: async ({ edits }) => {
     console.log('🔵 [editCoffeeFilters] Called with:', { chatId, edits });
@@ -52,6 +63,12 @@ export const createEditCoffeeFiltersTool = (chatId: string) => tool({
 
       // Process each edit
       for (const { action, value } of edits) {
+        // Validate the value is in our allowed set
+        if (!allValues.includes(value as any)) {
+          console.log('⚠️ [editCoffeeFilters] Ignoring invalid value:', value);
+          continue;
+        }
+
         const category = findCategory(value);
         if (!category) {
           console.log('⚠️ [editCoffeeFilters] Skipping edit - category not found for value:', value);
