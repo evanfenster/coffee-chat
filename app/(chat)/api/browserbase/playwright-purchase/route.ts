@@ -2,9 +2,14 @@ import { chromium, Page } from 'playwright';
 import { APP_CONFIG } from '@/config/app.config';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
+import Browserbase from "@browserbasehq/sdk";
 
 if (!process.env.BROWSERBASE_API_KEY) {
   throw new Error('BROWSERBASE_API_KEY is required');
+}
+
+if (!process.env.BROWSERBASE_PROJECT_ID) {
+  throw new Error('BROWSERBASE_PROJECT_ID is required');
 }
 
 export async function POST(request: NextRequest) {
@@ -42,16 +47,26 @@ export async function POST(request: NextRequest) {
 
     console.log('Starting purchase automation for product:', productHandle);
 
-    // Connect to Browserbase
-    browser = await chromium.connectOverCDP(
-      `wss://connect.browserbase.com?apiKey=${process.env.BROWSERBASE_API_KEY}`,
-    );
-    
-    const context = await browser.newContext({
-      viewport: { width: 1280, height: 720 }
+    // Initialize Browserbase
+    const bb = new Browserbase({
+      apiKey: process.env.BROWSERBASE_API_KEY,
     });
-    
-    page = await context.newPage();
+
+    // Create a new session
+    const bbSession = await bb.sessions.create({
+      projectId: process.env.BROWSERBASE_PROJECT_ID!,
+    });
+
+    // Connect to the session
+    browser = await chromium.connectOverCDP(bbSession.connectUrl);
+
+    // Get default context and page
+    const context = browser.contexts()[0];
+    page = context?.pages()[0];
+
+    if (!page) {
+      throw new Error('No default page available');
+    }
 
     try {
       console.log('Navigating to product page...');
