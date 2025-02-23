@@ -187,11 +187,11 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
               </div>
 
               <h2 className="text-2xl font-semibold text-sidebar-foreground mb-2">
-                Payment Successful!
+                Payment Successful
               </h2>
               
               <p className="text-sidebar-foreground/70 text-center mb-8 max-w-sm">
-                Our automated agent is now placing your order. You'll receive a notification when your order is complete.
+                Our automated agent is now placing your order. You&apos;ll receive a notification when your order is complete.
               </p>
 
               <div className="w-full max-w-sm p-4 bg-sidebar-accent/10 rounded-lg mb-8 border border-sidebar-border">

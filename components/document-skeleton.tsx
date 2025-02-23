@@ -5,7 +5,7 @@ import { BlockKind } from './block';
 export const DocumentSkeleton = ({ blockKind }: { blockKind: BlockKind }) => {
   return (
     <div className="flex flex-col gap-4 w-full justify-center items-center h-[calc(100dvh-60px)]">
-      <div className="animate-pulse rounded-lg bg-muted-foreground/20 w-96 h-96" />
+      <div className="animate-pulse rounded-lg bg-muted-foreground/20 size-96" />
     </div>
   );
 };
