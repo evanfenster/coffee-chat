@@ -3,6 +3,10 @@ import { APP_CONFIG } from '@/config/app.config';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
 
+if (!process.env.BROWSERBASE_API_KEY) {
+  throw new Error('BROWSERBASE_API_KEY is required');
+}
+
 export async function POST(request: NextRequest) {
   let browser;
   let page: Page | undefined;
@@ -38,10 +42,10 @@ export async function POST(request: NextRequest) {
 
     console.log('Starting purchase automation for product:', productHandle);
 
-    browser = await chromium.launch({
-      headless: false,
-      slowMo: 1000,
-    });
+    // Connect to Browserbase
+    browser = await chromium.connectOverCDP(
+      `wss://connect.browserbase.com?apiKey=${process.env.BROWSERBASE_API_KEY}`,
+    );
     
     const context = await browser.newContext({
       viewport: { width: 1280, height: 720 }
@@ -127,12 +131,12 @@ export async function POST(request: NextRequest) {
 
       const orderNumber = await page.$eval(
         '[data-test="order-number"], .order-number, .confirmation-number',
-        el => el.textContent?.trim() || ''
+        (el: HTMLElement) => el.textContent?.trim() || ''
       );
 
       const total = await page.$eval(
         '[data-test="order-total"], .order-total, .total-amount',
-        el => el.textContent?.trim() || ''
+        (el: HTMLElement) => el.textContent?.trim() || ''
       );
 
       console.log('Purchase completed successfully!');
