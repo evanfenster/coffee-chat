@@ -1,61 +1,59 @@
-<a href="https://chat.vercel.ai/">
-  <img alt="Next.js 14 and App Router-ready AI chatbot." src="app/(chat)/opengraph-image.png">
-  <h1 align="center">Next.js AI Chatbot</h1>
-</a>
+# Coffee Chat
 
-<p align="center">
-  An Open-Source AI Chatbot Template Built With Next.js and the AI SDK by Vercel.
-</p>
+Coffee Chat is a pioneering AI agent system that can autonomously make purchases on third-party e-commerce sites. Unlike traditional integrations that require partner APIs, this agent can hold user funds and execute purchases through web automation - starting with a focused use case of coffee beans to validate the concept.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#model-providers"><strong>Model Providers</strong></a> ·
-  <a href="#deploy-your-own"><strong>Deploy Your Own</strong></a> ·
-  <a href="#running-locally"><strong>Running locally</strong></a>
-</p>
-<br/>
+## Overview
 
-## Features
+Coffee Chat demonstrates a novel approach to AI-powered shopping:
 
-- [Next.js](https://nextjs.org) App Router
-  - Advanced routing for seamless navigation and performance
-  - React Server Components (RSCs) and Server Actions for server-side rendering and increased performance
-- [AI SDK](https://sdk.vercel.ai/docs)
-  - Unified API for generating text, structured objects, and tool calls with LLMs
-  - Hooks for building dynamic chat and generative user interfaces
-  - Supports OpenAI (default), Anthropic, Cohere, and other model providers
-- [shadcn/ui](https://ui.shadcn.com)
-  - Styling with [Tailwind CSS](https://tailwindcss.com)
-  - Component primitives from [Radix UI](https://radix-ui.com) for accessibility and flexibility
-- Data Persistence
-  - [Vercel Postgres powered by Neon](https://vercel.com/storage/postgres) for saving chat history and user data
-  - [Vercel Blob](https://vercel.com/storage/blob) for efficient file storage
-- [NextAuth.js](https://github.com/nextauthjs/next-auth)
-  - Simple and secure authentication
+1. **Autonomous Shopping**: The AI agent doesn't just recommend - it can hold funds and complete purchases through web automation without requiring direct API integration
+2. **Secure Fund Management**: Uses Stripe's platform to securely hold user funds and issue virtual cards for purchases
+3. **Web Automation**: Leverages Browserbase to execute the complete purchase flow on e-commerce sites
 
-## Model Providers
+### How It Works
 
-This template ships with OpenAI `gpt-4o` as the default. However, with the [AI SDK](https://sdk.vercel.ai/docs), you can switch LLM providers to [OpenAI](https://openai.com), [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), and [many more](https://sdk.vercel.ai/providers/ai-sdk-providers) with just a few lines of code.
+1. **Conversation & Discovery**
+   - AI-powered chat to understand user preferences
+   - Expert knowledge base for informed recommendations
+   - Dynamic filtering to find the perfect match
 
-## Deploy Your Own
+2. **Payment & Fund Holding**
+   - Secure fund collection via Stripe Checkout
+   - Funds held in escrow until purchase confirmation
+   - Automated refund system if execution fails
 
-You can deploy your own version of the Next.js AI Chatbot to Vercel with one click:
+3. **Purchase Execution**
+   The magic happens through a sophisticated automation flow:
+   - Stripe creates a virtual card for the purchase
+   - Browserbase executes the complete checkout process
+   - Real-time status updates throughout the process
+   - Automatic error recovery and refund processing
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fai-chatbot&env=AUTH_SECRET,OPENAI_API_KEY&envDescription=Learn%20more%20about%20how%20to%20get%20the%20API%20Keys%20for%20the%20application&envLink=https%3A%2F%2Fgithub.com%2Fvercel%2Fai-chatbot%2Fblob%2Fmain%2F.env.example&demo-title=AI%20Chatbot&demo-description=An%20Open-Source%20AI%20Chatbot%20Template%20Built%20With%20Next.js%20and%20the%20AI%20SDK%20by%20Vercel.&demo-url=https%3A%2F%2Fchat.vercel.ai&stores=[{%22type%22:%22postgres%22},{%22type%22:%22blob%22}])
+### Safety First
 
-## Running locally
+The system is built with multiple layers of protection:
 
-You will need to use the environment variables [defined in `.env.example`](.env.example) to run Next.js AI Chatbot. It's recommended you use [Vercel Environment Variables](https://vercel.com/docs/projects/environment-variables) for this, but a `.env` file is all that is necessary.
+- Stripe handles all financial transactions and fund holding
+- Virtual cards provide an extra layer of security
+- Automated refund processing on any failure
+- Comprehensive error handling and logging
+- Real-time transaction monitoring
 
-> Note: You should not commit your `.env` file or it will expose secrets that will allow others to control access to your various OpenAI and authentication provider accounts.
+### Why This Matters
 
-1. Install Vercel CLI: `npm i -g vercel`
-2. Link local instance with Vercel and GitHub accounts (creates `.vercel` directory): `vercel link`
-3. Download your environment variables: `vercel env pull`
+This project demonstrates a new paradigm for AI shopping agents:
 
-```bash
-pnpm install
-pnpm dev
-```
+1. **Novel Approach**: Instead of requiring partner integrations or APIs, this agent can potentially work with any e-commerce site through web automation
 
-Your app template should now be running on [localhost:3000](http://localhost:3000/).
+2. **Complete Process**:
+   - Holds user funds securely
+   - Creates virtual payment methods
+   - Executes full purchase flows
+   - Handles shipping and delivery details
+
+3. **Scalable Foundation**:
+   - Built on Vercel's infrastructure
+   - Uses Stripe's secure payment platform
+   - Powered by Browserbase's reliable automation
+
+While currently focused on a single e-commerce use case, this represents the first step toward truly autonomous shopping agents - ones that could eventually navigate and purchase from any e-commerce site, just like a human would.

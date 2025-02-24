@@ -13,9 +13,12 @@ export const metadata: Metadata = {
   title: APP_CONFIG.app.name,
   description: APP_CONFIG.app.description,
   icons: {
-    icon: { url: '/favicon.ico', type: 'image/x-icon' }
-  }
-};
+    icon: [
+      { url: '/favicon.ico', type: 'image/x-icon' },
+      { url: '/favicon.png', type: 'image/png' }
+    ],
+  },
+}
 
 export const viewport = {
   maximumScale: 1, // Disable auto-zoom on mobile Safari
