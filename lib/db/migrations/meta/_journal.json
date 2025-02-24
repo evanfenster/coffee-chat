@@ -99,6 +99,13 @@
       "when": 1740188781747,
       "tag": "0013_bouncy_butterfly",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1740361890098,
+      "tag": "0014_ancient_jackpot",
+      "breakpoints": true
     }
   ]
 }

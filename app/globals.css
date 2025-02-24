@@ -226,3 +226,14 @@ h1, h2, h3, h4, .brand-text {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(44, 28, 20, 0.1);
 }
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

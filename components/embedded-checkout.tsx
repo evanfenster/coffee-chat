@@ -298,6 +298,13 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
 
                   const { cardDetails } = await cardResponse.json()
 
+                  // Fetch shipping address
+                  const addressResponse = await fetch('/api/shipping-address')
+                  if (!addressResponse.ok) {
+                    throw new Error('Failed to fetch shipping address')
+                  }
+                  const shippingAddress = await addressResponse.json()
+
                   // Start automated purchase
                   try {
                     const response = await fetch('/api/browserbase/playwright-purchase', {
@@ -307,7 +314,17 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                       },
                       body: JSON.stringify({
                         productHandle: product.handle,
-                        cardDetails
+                        cardDetails: {
+                          ...cardDetails,
+                          address: {
+                            line1: shippingAddress.addressLine1,
+                            line2: shippingAddress.addressLine2,
+                            city: shippingAddress.city,
+                            state: shippingAddress.state,
+                            postal_code: shippingAddress.postalCode,
+                            country: shippingAddress.country
+                          }
+                        }
                       })
                     });
 

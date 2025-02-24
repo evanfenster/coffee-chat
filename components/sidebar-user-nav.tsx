@@ -4,6 +4,7 @@ import Image from 'next/image';
 import type { User } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
+import { useRouter } from 'next/navigation';
 
 import {
   DropdownMenu,
@@ -16,10 +17,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar';
+import { ShoppingBagIcon } from '@/components/icons';
 
 export function SidebarUserNav({ user }: { user: User }) {
   const { setTheme, theme } = useTheme();
+  const router = useRouter();
+  const { setOpenMobile } = useSidebar();
 
   return (
     <SidebarMenu>
@@ -42,13 +47,25 @@ export function SidebarUserNav({ user }: { user: User }) {
             side="top"
             className="w-[--radix-popper-anchor-width]"
           >
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={() => {
+                setOpenMobile(false);
+                router.push('/orders');
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <ShoppingBagIcon />
+                <span>Orders</span>
+              </div>
+            </DropdownMenuItem>
             {/* <DropdownMenuItem
               className="cursor-pointer"
               onSelect={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
               {`Toggle ${theme === 'light' ? 'dark' : 'light'} mode`}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator /> */}
+            </DropdownMenuItem> */}
+            <DropdownMenuSeparator /> 
             <DropdownMenuItem asChild>
               <button
                 type="button"

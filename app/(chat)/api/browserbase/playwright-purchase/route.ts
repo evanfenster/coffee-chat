@@ -103,8 +103,7 @@ export async function POST(request: NextRequest) {
       await page.getByRole('combobox', { name: 'Address' }).fill(cardDetails.address.line1);
       await page.getByRole('textbox', { name: 'City' }).fill(cardDetails.address.city);
       await page.getByLabel('State').selectOption(cardDetails.address.state);
-      //await page.getByRole('textbox', { name: 'ZIP code' }).fill(cardDetails.address.postal_code);
-      await page.getByRole('textbox', { name: 'ZIP code' }).fill('94158'); // San Francisco, CA for test data
+      await page.getByRole('textbox', { name: 'ZIP code' }).fill(cardDetails.address.postal_code);
 
       await page.getByRole('button', { name: 'Continue to shipping' }).click();
       await page.waitForTimeout(2000);
