@@ -106,6 +106,13 @@
       "when": 1740361890098,
       "tag": "0014_ancient_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1740364783964,
+      "tag": "0015_strange_maverick",
+      "breakpoints": true
     }
   ]
 }

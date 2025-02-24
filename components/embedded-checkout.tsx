@@ -298,6 +298,28 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
 
                   const { cardDetails } = await cardResponse.json()
 
+                  // Create order
+                  const orderResponse = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      productHandle: product.handle,
+                      productName: product.name,
+                      price: product.price,
+                      stripeSessionId: sessionId,
+                      cardHolderId: cardDetails.cardHolderId,
+                      cardId: cardDetails.cardId,
+                    }),
+                  });
+
+                  if (!orderResponse.ok) {
+                    throw new Error('Failed to create order');
+                  }
+
+                  const order = await orderResponse.json();
+
                   // Fetch shipping address
                   const addressResponse = await fetch('/api/shipping-address')
                   if (!addressResponse.ok) {
@@ -334,6 +356,18 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                       throw new Error(data.details || data.error || 'Failed to complete automated purchase');
                     }
 
+                    // Update order status to completed
+                    await fetch('/api/orders', {
+                      method: 'PUT',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        orderId: order.id,
+                        status: 'completed',
+                      }),
+                    });
+
                     setStatus('success');
                     setToastMessage({
                       type: 'success',
@@ -342,6 +376,19 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                     });
                   } catch (error) {
                     console.error('Error in automation:', error);
+                    
+                    // Update order status to failed
+                    await fetch('/api/orders', {
+                      method: 'PUT',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        orderId: order.id,
+                        status: 'failed',
+                        errorDetails: error instanceof Error ? error.message : 'Unknown error',
+                      }),
+                    });
                     
                     // Always attempt to refund on any error
                     try {
@@ -356,6 +403,18 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                       if (!refundResponse.ok) {
                         throw new Error('Failed to process refund');
                       }
+
+                      // Update order status to refunded
+                      await fetch('/api/orders', {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          orderId: order.id,
+                          status: 'refunded',
+                        }),
+                      });
 
                       setStatus('error');
                       setToastMessage({

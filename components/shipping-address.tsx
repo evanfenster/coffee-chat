@@ -31,6 +31,8 @@ const DEFAULT_COUNTRY = "US"
 export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
+  const [currentAddress, setCurrentAddress] = useState<Address | null>(null)
 
   const { control, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<Address>({
     defaultValues: {
@@ -61,14 +63,16 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
       const response = await fetch('/api/shipping-address')
       if (!response.ok) {
         if (response.status === 404) {
-          // If no address exists yet, keep default values
+          // If no address exists yet, enable editing mode
+          setIsEditing(true)
           setIsLoading(false)
           return
         }
         throw new Error('Failed to fetch address')
       }
       const data = await response.json()
-      // Reset with default values for any missing fields
+      setCurrentAddress(data)
+      // Reset form with current values
       reset({
         addressLine1: data.addressLine1 || '',
         addressLine2: data.addressLine2 || '',
@@ -77,6 +81,7 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
         postalCode: data.postalCode || '',
         country: data.country || DEFAULT_COUNTRY
       })
+      setIsEditing(false)
     } catch (error) {
       console.error('Error fetching address:', error)
       toast.error('Failed to load address', {
@@ -110,8 +115,10 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
         throw new Error(responseData.error || 'Failed to update address');
       }
 
+      setCurrentAddress(data)
+      setIsEditing(false)
       toast.success('Address saved successfully')
-      onComplete?.() // This will close the modal
+      onComplete?.()
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to save address';
       console.error('Error updating address:', {
@@ -131,6 +138,28 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
     return (
       <div className="flex justify-center items-center min-h-[300px]">
         <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    )
+  }
+
+  if (!isEditing && currentAddress) {
+    const countryName = Country.getCountryByCode(currentAddress.country)?.name || currentAddress.country
+    const stateName = State.getStateByCodeAndCountry(currentAddress.state, currentAddress.country)?.name || currentAddress.state
+
+    return (
+      <div 
+        onClick={() => setIsEditing(true)}
+        className="space-y-6 p-4 border rounded-lg cursor-pointer transition-colors hover:bg-accent/50 group relative"
+      >
+        <div className="space-y-1">
+          <p>{currentAddress.addressLine1}</p>
+          {currentAddress.addressLine2 && <p>{currentAddress.addressLine2}</p>}
+          <p>{currentAddress.city}, {stateName} {currentAddress.postalCode}</p>
+          <p>{countryName}</p>
+        </div>
+        <div className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Edit2 className="h-4 w-4 text-muted-foreground" />
+        </div>
       </div>
     )
   }
@@ -292,7 +321,27 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
           </div>
         </div>
 
-        <div className="flex justify-end pt-4">
+        <div className="flex justify-end gap-3 pt-4">
+          {currentAddress && (
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => {
+                setIsEditing(false)
+                // Reset form to current address
+                reset({
+                  addressLine1: currentAddress.addressLine1,
+                  addressLine2: currentAddress.addressLine2 || '',
+                  city: currentAddress.city,
+                  state: currentAddress.state,
+                  postalCode: currentAddress.postalCode,
+                  country: currentAddress.country
+                })
+              }}
+            >
+              Cancel
+            </Button>
+          )}
           <Button type="submit" disabled={isSaving}>
             {isSaving ? (
               <>
@@ -300,7 +349,10 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
                 Saving...
               </>
             ) : (
-              'Save & Continue'
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save Address
+              </>
             )}
           </Button>
         </div>

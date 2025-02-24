@@ -174,3 +174,24 @@ export const knowledgeEmbedding = pgTable(
 
 export type KnowledgeResource = InferSelectModel<typeof knowledgeResource>;
 export type KnowledgeEmbedding = InferSelectModel<typeof knowledgeEmbedding>;
+
+export const order = pgTable('Order', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
+  userId: uuid('userId')
+    .notNull()
+    .references(() => user.id),
+  productHandle: varchar('productHandle', { length: 255 }).notNull(),
+  productName: varchar('productName', { length: 255 }).notNull(),
+  price: varchar('price', { length: 50 }).notNull(),
+  status: varchar('status', { 
+    enum: ['pending', 'processing', 'completed', 'failed', 'refunded'] 
+  }).notNull().default('pending'),
+  stripeSessionId: varchar('stripeSessionId', { length: 255 }).notNull(),
+  cardHolderId: varchar('cardHolderId', { length: 255 }),
+  cardId: varchar('cardId', { length: 255 }),
+  errorDetails: text('errorDetails'),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+});
+
+export type Order = InferSelectModel<typeof order>;

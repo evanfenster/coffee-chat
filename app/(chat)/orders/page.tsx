@@ -1,4 +1,5 @@
 import ShippingAddress from '@/components/shipping-address';
+import OrderHistory from '@/components/order-history';
 
 export default function OrdersPage() {
   return (
@@ -11,8 +12,12 @@ export default function OrdersPage() {
           </p>
         </div>
       </div>
-      <div className="grid gap-4">
-        <ShippingAddress />
+      <div className="grid gap-8">
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Shipping Information</h2>
+          <ShippingAddress />
+        </div>
+        <OrderHistory />
       </div>
     </div>
   );
