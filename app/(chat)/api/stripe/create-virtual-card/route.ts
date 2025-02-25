@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       cardId: card.id,
       cardDetails: {
+        cardId: card.id,
         number: cardDetails.number,
         expiry: `${card.exp_month}/${card.exp_year.toString().slice(-2)}`,
         cvc: cardDetails.cvc,
