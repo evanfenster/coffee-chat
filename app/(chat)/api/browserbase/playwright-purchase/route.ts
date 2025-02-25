@@ -15,6 +15,7 @@ if (!process.env.BROWSERBASE_PROJECT_ID) {
 export async function POST(request: NextRequest) {
   let browser;
   let page: Page | undefined;
+  let cardDetails;
   
   try {
     const session = await auth()
@@ -25,7 +26,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { productHandle, cardDetails } = await request.json()
+    const { productHandle, cardDetails: requestCardDetails } = await request.json()
+    cardDetails = requestCardDetails;
+    
     if (!productHandle || !cardDetails) {
       return NextResponse.json(
         { error: 'Product handle and card details are required' },
@@ -34,12 +37,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate card details
-    if (!cardDetails.number || !cardDetails.expiry || !cardDetails.cvc) {
+    if (!cardDetails.number || !cardDetails.expiry || !cardDetails.cvc || !cardDetails.cardId) {
       return NextResponse.json(
         { error: 'Invalid card details provided', details: { 
           hasNumber: !!cardDetails.number,
           hasExpiry: !!cardDetails.expiry,
-          hasCvc: !!cardDetails.cvc
+          hasCvc: !!cardDetails.cvc,
+          hasCardId: !!cardDetails.cardId
         }},
         { status: 400 }
       )
@@ -184,6 +188,27 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   } finally {
+    // Deactivate the virtual card regardless of purchase outcome
+    if (cardDetails?.cardId) {
+      try {
+        const deactivateResponse = await fetch(`${request.nextUrl.origin}/api/stripe/deactivate-card`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ cardId: cardDetails.cardId })
+        });
+
+        if (!deactivateResponse.ok) {
+          console.error('Failed to deactivate card:', await deactivateResponse.text());
+        } else {
+          console.log('Successfully deactivated card:', cardDetails.cardId);
+        }
+      } catch (error) {
+        console.error('Error deactivating card:', error);
+      }
+    }
+
     if (browser) {
       try {
         console.log('Closing browser...');
