@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useForm, SubmitHandler, Controller } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -54,11 +54,7 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
     [selectedCountry]
   )
 
-  useEffect(() => {
-    fetchAddress()
-  }, [])
-
-  const fetchAddress = async () => {
+  const fetchAddress = useCallback(async () => {
     try {
       const response = await fetch('/api/shipping-address')
       if (!response.ok) {
@@ -90,7 +86,11 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [reset])
+
+  useEffect(() => {
+    fetchAddress()
+  }, [fetchAddress])
 
   const onSubmit: SubmitHandler<Address> = async (data) => {
     setIsSaving(true)

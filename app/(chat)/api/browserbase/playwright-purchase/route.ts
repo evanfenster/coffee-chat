@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
-import Browserbase from "@browserbasehq/sdk";
+import BrowserbaseSDK from "@browserbasehq/sdk";
 import { executeTradeCoffeePurchase } from '../purchase-flows/trade-coffee';
 import { executeTestCheckoutPurchase } from '../purchase-flows/test-checkout';
 
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
 
     // Initialize Browserbase
     console.log('Initializing Browserbase...');
-    const bb = new Browserbase({
+    const bb = new BrowserbaseSDK({
       apiKey: process.env.BROWSERBASE_API_KEY,
     });
 

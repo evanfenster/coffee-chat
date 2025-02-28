@@ -37,7 +37,7 @@ export default function OrderHistory() {
         throw new Error('Failed to fetch orders')
       }
       const data = await response.json()
-      setOrders(data)
+      setOrders([...data].reverse())
     } catch (error) {
       console.error('Error fetching orders:', error)
       toast.error('Failed to load orders', {

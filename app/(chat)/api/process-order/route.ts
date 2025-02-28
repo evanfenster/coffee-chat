@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
+import { calculateFinalPrice } from '@/lib/utils/pricing';
 
 export async function POST(request: NextRequest) {
   try {
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           productHandle: product.handle,
           productName: product.name,
-          price: product.price,
+          price: calculateFinalPrice(parseFloat(product.price)).toString(),
           stripeSessionId: sessionId,
           cardHolderId: cardDetails.cardHolderId,
           cardId: cardDetails.cardId,

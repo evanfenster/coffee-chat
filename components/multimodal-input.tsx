@@ -21,7 +21,7 @@ import {
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
-import { sanitizeUIMessages } from '@/lib/utils';
+import { sanitizeUIMessages, cn } from '@/lib/utils';
 import { APP_CONFIG } from '@/config/app.config';
 
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
@@ -30,7 +30,6 @@ import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { SuggestedActions } from './suggested-actions';
 import equal from 'fast-deep-equal';
-import { cn } from '@/lib/utils';
 
 function PureMultimodalInput({
   chatId,

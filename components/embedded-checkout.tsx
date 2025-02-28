@@ -51,12 +51,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
         });
       }
       
-      // Close dialog after toast
-      const timer = setTimeout(() => {
-        onClose();
-      }, 10000); // 10 seconds
-      
-      return () => clearTimeout(timer);
+      // Remove the automatic dialog closing since we're now closing it immediately after processing
     }
   }, [toastMessage, onClose]);
 
@@ -95,7 +90,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
   if (error) {
     return (
       <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50">
-        <div className="fixed right-0 top-0 h-full w-full max-w-[500px] animate-slide-in">
+        <div className="fixed right-0 top-0 size-full max-w-[500px] animate-slide-in">
           <div className="h-full bg-sidebar">
             <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
               <div className="flex items-center gap-2">
@@ -161,7 +156,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
   if (status === 'complete') {
     return (
       <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50">
-        <div className="fixed right-0 top-0 h-full w-full max-w-[500px] animate-slide-in">
+        <div className="fixed right-0 top-0 size-full max-w-[500px] animate-slide-in">
           <div className="h-full bg-sidebar">
             <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
               <div className="flex items-center gap-2">
@@ -227,7 +222,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
   if (!clientSecret) {
     return (
       <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50">
-        <div className="fixed right-0 top-0 h-full w-full max-w-[500px] animate-slide-in">
+        <div className="fixed right-0 top-0 size-full max-w-[500px] animate-slide-in">
           <div className="h-full bg-white p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -254,7 +249,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50">
-      <div className="fixed right-0 top-0 h-full w-full max-w-[500px] animate-slide-in">
+      <div className="fixed right-0 top-0 size-full max-w-[500px] animate-slide-in">
         <div className="h-full bg-white">
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-2">
@@ -301,6 +296,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                     throw new Error(result.error || 'Failed to process order');
                   }
 
+                  // Set success status and show toast, but don't wait for the toast to close
                   setStatus('success');
                   setToastMessage({
                     type: 'success',
@@ -310,12 +306,16 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
 
                 } catch (error) {
                   console.error('Error processing order:', error);
+                  // Set error status and show toast, but don't wait for the toast to close
                   setStatus('error');
                   setToastMessage({
                     type: 'error',
                     message: 'Order Failed',
                     description: 'We encountered an error and have refunded your payment. Please try again.'
                   });
+                } finally {
+                  // Close the checkout dialog immediately after processing, regardless of success or failure
+                  onClose();
                 }
               },
             }}
