@@ -1,12 +1,12 @@
 export const APP_CONFIG = {
   app: {
-    url: 'https://coffee-chat-bay.vercel.app/',
-    name: 'Coffee Chat',
+    url: 'https://baristaagent.com',
+    name: 'Barista Agent',
     description: 'Interactive chatbot that helps you find and purchase new coffee beans.',
     icon: '☕'
   },
   welcome: {
-    title: 'Welcome to Coffee Chat',
+    title: 'Welcome to Barista Agent',
     tagline: "Let's find your next favorite coffee.",
     suggestions: [
       {

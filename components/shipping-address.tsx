@@ -137,7 +137,7 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[300px]">
-        <Loader2 className="h-6 w-6 animate-spin" />
+        <Loader2 className="size-6 animate-spin" />
       </div>
     )
   }
@@ -158,7 +158,7 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
           <p>{countryName}</p>
         </div>
         <div className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Edit2 className="h-4 w-4 text-muted-foreground" />
+          <Edit2 className="size-4 text-muted-foreground" />
         </div>
       </div>
     )
@@ -345,12 +345,12 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
           <Button type="submit" disabled={isSaving}>
             {isSaving ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 size-4 animate-spin" />
                 Saving...
               </>
             ) : (
               <>
-                <Save className="mr-2 h-4 w-4" />
+                <Save className="mr-2 size-4" />
                 Save Address
               </>
             )}

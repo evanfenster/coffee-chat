@@ -1,10 +1,10 @@
-# Coffee Chat
+# Barista Agent
 
-Coffee Chat is a pioneering AI agent system that can autonomously make purchases on third-party e-commerce sites. Unlike traditional integrations that require partner APIs, this agent can hold user funds and execute purchases through web automation - starting with a focused use case of coffee beans to validate the concept.
+Barisa Agent is a pioneering AI agent system that can autonomously make purchases on third-party e-commerce sites. Unlike traditional integrations that require partner APIs, this agent can hold user funds and execute purchases through web automation - starting with a focused use case of coffee beans to validate the concept.
 
 ## Overview
 
-Coffee Chat demonstrates a novel approach to AI-powered shopping:
+Barisa Agent demonstrates a novel approach to AI-powered shopping:
 
 1. **Autonomous Shopping**: The AI agent doesn't just recommend - it can hold funds and complete purchases through web automation without requiring direct API integration
 2. **Secure Fund Management**: Uses Stripe's platform to securely hold user funds and issue virtual cards for purchases

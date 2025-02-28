@@ -7,7 +7,7 @@ export function TermsOfService() {
       <p className="text-sm text-gray-500 dark:text-gray-400">Last Updated: February 28, 2025</p>
 
       <p>
-        Welcome to Barista Agent ("Service"), an AI-driven platform developed by Evan Fenster ("we," "us," or "our") that helps you find your next favorite coffee bean and facilitates the purchase process. By creating an account and using our Service, you ("User" or "you") agree to be bound by these Terms of Service ("Terms"). These Terms also serve as our Privacy Policy.
+        Welcome to Barista Agent (&ldquo;Service&rdquo;), an AI-driven platform developed by Evan Fenster (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) that helps you find your next favorite coffee bean and facilitates the purchase process. By creating an account and using our Service, you (&ldquo;User&rdquo; or &ldquo;you&rdquo;) agree to be bound by these Terms of Service (&ldquo;Terms&rdquo;). These Terms also serve as our Privacy Policy.
       </p>
 
       <h2>1. Acceptance of Terms</h2>
@@ -25,15 +25,15 @@ export function TermsOfService() {
 
       <h2>3. Service Description</h2>
       <p>
-        Barista Agent is an AI chatbot that assists users in identifying coffee beans of interest. When you select "Buy Now," you will complete a payment through Stripe. Upon payment, our system uses the provided card details (processed securely by Stripe) and the shipping information you supply to complete a purchase on your behalf from a designated website. We do not store any card information; only shipping details are retained for the purpose of fulfilling your order.
+        Barista Agent is an AI chatbot that assists users in identifying coffee beans of interest. When you select &ldquo;Buy Now,&rdquo; you will complete a payment through Stripe. Upon payment, our system uses the provided card details (processed securely by Stripe) and the shipping information you supply to complete a purchase on your behalf from a designated website. We do not store any card information; only shipping details are retained for the purpose of fulfilling your order.
       </p>
 
       <h2>4. Payment and Refunds</h2>
       <p>
-        <strong>Payment Processing:</strong> Payments are processed by Stripe, a third-party payment provider. By using our Service, you agree to be bound by Stripe's terms and privacy policies.
+        <strong>Payment Processing:</strong> Payments are processed by Stripe, a third-party payment provider. By using our Service, you agree to be bound by Stripe&rsquo;s terms and privacy policies.
       </p>
       <p>
-        <strong>Transaction Process:</strong> Once you complete the Stripe checkout, we immediately initiate a purchase via an automated agent. If the transaction fails, an instant refund is triggered through Stripe (typically within 2 minutes; however, processing times may vary based on Stripe's policies).
+        <strong>Transaction Process:</strong> Once you complete the Stripe checkout, we immediately initiate a purchase via an automated agent. If the transaction fails, an instant refund is triggered through Stripe (typically within 2 minutes; however, processing times may vary based on Stripe&rsquo;s policies).
       </p>
 
       <h2>5. Privacy and Data Collection</h2>
@@ -85,7 +85,7 @@ export function TermsOfService() {
 
       <h2>8. Indemnification</h2>
       <p>
-        You agree to indemnify, defend, and hold harmless Barista Agent, its developer, and affiliated parties from any claims, damages, obligations, losses, liabilities, costs, or expenses (including reasonable attorneys' fees) arising from:
+        You agree to indemnify, defend, and hold harmless Barista Agent, its developer, and affiliated parties from any claims, damages, obligations, losses, liabilities, costs, or expenses (including reasonable attorneys&rsquo; fees) arising from:
       </p>
       <ul>
         <li>Your use of the Service,</li>
@@ -103,7 +103,7 @@ export function TermsOfService() {
 
       <h2>10. Modifications to the Terms</h2>
       <p>
-        We reserve the right to modify these Terms at any time. If changes are made, we will update the "Last Updated" date at the top of this document. Your continued use of the Service after such modifications constitutes acceptance of the updated Terms.
+        We reserve the right to modify these Terms at any time. If changes are made, we will update the &ldquo;Last Updated&rdquo; date at the top of this document. Your continued use of the Service after such modifications constitutes acceptance of the updated Terms.
       </p>
 
       <h2>11. Termination</h2>

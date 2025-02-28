@@ -51,7 +51,7 @@ export default function OrderHistory() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-        <Loader2 className="h-6 w-6 animate-spin" />
+        <Loader2 className="size-6 animate-spin" />
       </div>
     )
   }
