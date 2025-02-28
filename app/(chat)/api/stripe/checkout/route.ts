@@ -4,6 +4,7 @@ import { auth } from '@/app/(auth)/auth'
 import { db } from '@/lib/db/queries'
 import { user } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { calculateFinalPrice } from '@/lib/utils/pricing'
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,8 +27,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate price format
-    const priceInCents = Math.round(parseFloat(price) * 100)
+    // Calculate final price including fees and shipping (assuming non-subscriber)
+    const finalPrice = calculateFinalPrice(parseFloat(price))
+    
+    // Convert to cents for Stripe
+    const priceInCents = Math.round(finalPrice * 100)
     if (isNaN(priceInCents) || priceInCents <= 0) {
       return NextResponse.json(
         { error: 'Invalid price value' },
