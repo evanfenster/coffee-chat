@@ -8,6 +8,7 @@ import { Button } from "./ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog"
 import ShippingAddress from "./shipping-address"
 import { toast } from "sonner"
+import { calculateFinalPrice } from "@/lib/utils/pricing"
 
 interface Product {
   name: string
@@ -151,10 +152,13 @@ export function ProductCard({
                 </div>
                 <div className="flex flex-col items-end">
                   <div className="text-lg font-semibold text-primary">
-                    {product.price}
+                    ${calculateFinalPrice(parseFloat(product.price))}
                   </div>
                   <div className="text-xs text-muted-foreground font-medium">
                     per bag
+                  </div>
+                  <div className="text-[10px] text-muted-foreground italic">
+                    shipping & fees included
                   </div>
                 </div>
               </div>

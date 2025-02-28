@@ -8,6 +8,7 @@ import {
 import { loadStripe } from '@stripe/stripe-js'
 import { Coffee, X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { calculateFinalPrice } from '@/lib/utils/pricing'
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error(
@@ -34,6 +35,26 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
   const [error, setError] = useState<string | null>(null)
   const [status, setStatus] = useState<'initial' | 'processing' | 'complete' | 'error' | 'success'>('initial')
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error', message: string, description: string } | null>(null)
+
+  // Function to deactivate card
+  const deactivateCard = async (cardId: string) => {
+    try {
+      console.log('Deactivating virtual card...', cardId);
+      const deactivateResponse = await fetch('/api/stripe/deactivate-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cardId })
+      });
+
+      if (!deactivateResponse.ok) {
+        console.error('Failed to deactivate card');
+      } else {
+        console.log('Successfully deactivated card');
+      }
+    } catch (deactivateError) {
+      console.error('Error deactivating card:', deactivateError);
+    }
+  };
 
   // Handle toast notifications
   useEffect(() => {
@@ -67,7 +88,10 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(product),
+          body: JSON.stringify({
+            ...product,
+            price: calculateFinalPrice(parseFloat(product.price)).toString()
+          }),
         })
 
         const data = await response.json()
@@ -135,7 +159,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                   </div>
                   <div>
                     <h3 className="font-medium text-sidebar-foreground">{product.name}</h3>
-                    <p className="text-sm text-sidebar-foreground/70">${product.price}</p>
+                    <p className="text-sm text-sidebar-foreground/70">${calculateFinalPrice(parseFloat(product.price))}</p>
                   </div>
                 </div>
               </div>
@@ -201,7 +225,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                   </div>
                   <div>
                     <h3 className="font-medium text-sidebar-foreground">{product.name}</h3>
-                    <p className="text-sm text-sidebar-foreground/70">${product.price}</p>
+                    <p className="text-sm text-sidebar-foreground/70">${calculateFinalPrice(parseFloat(product.price))}</p>
                   </div>
                 </div>
               </div>
@@ -268,177 +292,55 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
               onComplete: async () => {
                 const sessionId = clientSecret.split('_secret_')[0]
                 setStatus('complete')
+                console.log('Stripe checkout completed, sessionId:', sessionId);
 
                 try {
-                  // Create cardholder first
-                  const cardholderResponse = await fetch('/api/stripe/create-cardholder', {
+                  console.log('Processing order...');
+                  const response = await fetch('/api/process-order', {
                     method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ sessionId }),
-                  })
-
-                  if (!cardholderResponse.ok) {
-                    throw new Error('Failed to create cardholder')
-                  }
-
-                  // Then create virtual card
-                  const cardResponse = await fetch('/api/stripe/create-virtual-card', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ sessionId }),
-                  })
-
-                  if (!cardResponse.ok) {
-                    throw new Error('Failed to create virtual card')
-                  }
-
-                  const { cardDetails } = await cardResponse.json()
-
-                  // Create order
-                  const orderResponse = await fetch('/api/orders', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      productHandle: product.handle,
-                      productName: product.name,
-                      price: product.price,
-                      stripeSessionId: sessionId,
-                      cardHolderId: cardDetails.cardHolderId,
-                      cardId: cardDetails.cardId,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                      sessionId,
+                      product
                     }),
                   });
 
-                  if (!orderResponse.ok) {
-                    throw new Error('Failed to create order');
+                  console.log('Process order response status:', response.status);
+                  
+                  // Check if response is JSON before parsing
+                  const contentType = response.headers.get('content-type');
+                  if (!contentType || !contentType.includes('application/json')) {
+                    console.error('Non-JSON response received:', await response.text());
+                    throw new Error('Server returned non-JSON response');
+                  }
+                  
+                  const result = await response.json();
+                  console.log('Process order result:', result);
+
+                  // Always deactivate card if we have one
+                  if (result.cardId) {
+                    console.log('Deactivating card:', result.cardId);
+                    await deactivateCard(result.cardId);
                   }
 
-                  const order = await orderResponse.json();
-
-                  // Fetch shipping address
-                  const addressResponse = await fetch('/api/shipping-address')
-                  if (!addressResponse.ok) {
-                    throw new Error('Failed to fetch shipping address')
+                  if (!response.ok) {
+                    throw new Error(result.error || 'Failed to process order');
                   }
-                  const shippingAddress = await addressResponse.json()
 
-                  // Start automated purchase
-                  try {
-                    const response = await fetch('/api/browserbase/playwright-purchase', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        productHandle: product.handle,
-                        cardDetails: {
-                          ...cardDetails,
-                          address: {
-                            line1: shippingAddress.addressLine1,
-                            line2: shippingAddress.addressLine2,
-                            city: shippingAddress.city,
-                            state: shippingAddress.state,
-                            postal_code: shippingAddress.postalCode,
-                            country: shippingAddress.country
-                          }
-                        }
-                      })
-                    });
+                  setStatus('success');
+                  setToastMessage({
+                    type: 'success',
+                    message: 'Order Complete!',
+                    description: 'Your order has been successfully placed. Check your email for confirmation.'
+                  });
 
-                    const data = await response.json();
-                    
-                    if (!response.ok) {
-                      throw new Error(data.details || data.error || 'Failed to complete automated purchase');
-                    }
-
-                    // Update order status to completed
-                    await fetch('/api/orders', {
-                      method: 'PUT',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        orderId: order.id,
-                        status: 'completed',
-                      }),
-                    });
-
-                    setStatus('success');
-                    setToastMessage({
-                      type: 'success',
-                      message: 'Order Complete!',
-                      description: 'Your order has been successfully placed. Check your email for confirmation.'
-                    });
-                  } catch (error) {
-                    console.error('Error in automation:', error);
-                    
-                    // Update order status to failed
-                    await fetch('/api/orders', {
-                      method: 'PUT',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        orderId: order.id,
-                        status: 'failed',
-                        errorDetails: error instanceof Error ? error.message : 'Unknown error',
-                      }),
-                    });
-                    
-                    // Always attempt to refund on any error
-                    try {
-                      const refundResponse = await fetch('/api/stripe/refund', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ sessionId }),
-                      });
-
-                      if (!refundResponse.ok) {
-                        throw new Error('Failed to process refund');
-                      }
-
-                      // Update order status to refunded
-                      await fetch('/api/orders', {
-                        method: 'PUT',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                          orderId: order.id,
-                          status: 'refunded',
-                        }),
-                      });
-
-                      setStatus('error');
-                      setToastMessage({
-                        type: 'error',
-                        message: 'Order Failed',
-                        description: 'We encountered an error and have refunded your payment. Please try again.'
-                      });
-                    } catch (refundError) {
-                      console.error('Failed to process refund:', refundError);
-                      setStatus('error');
-                      setToastMessage({
-                        type: 'error',
-                        message: 'Critical Error',
-                        description: 'Your payment was processed but we couldn\'t complete your order or process a refund. Our support team has been notified and will contact you shortly.'
-                      });
-                    }
-                  }
                 } catch (error) {
-                  console.error('Unhandled error in automation:', error);
+                  console.error('Error processing order:', error);
                   setStatus('error');
                   setToastMessage({
                     type: 'error',
-                    message: 'Unexpected Error',
-                    description: 'Something went wrong. Our team has been notified and will investigate.'
+                    message: 'Order Failed',
+                    description: 'We encountered an error and have refunded your payment. Please try again.'
                   });
                 }
               },

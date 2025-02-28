@@ -1,8 +1,9 @@
-import { chromium, Page } from 'playwright';
-import { APP_CONFIG } from '@/config/app.config';
+import { chromium } from 'playwright';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
 import Browserbase from "@browserbasehq/sdk";
+import { executeTradeCoffeePurchase } from '../purchase-flows/trade-coffee';
+import { executeTestCheckoutPurchase } from '../purchase-flows/test-checkout';
 
 if (!process.env.BROWSERBASE_API_KEY) {
   throw new Error('BROWSERBASE_API_KEY is required');
@@ -12,32 +13,67 @@ if (!process.env.BROWSERBASE_PROJECT_ID) {
   throw new Error('BROWSERBASE_PROJECT_ID is required');
 }
 
+type PurchaseFlow = 'trade-coffee' | 'test-checkout';
+
+const purchaseFlows = {
+  'trade-coffee': executeTradeCoffeePurchase,
+  'test-checkout': executeTestCheckoutPurchase,
+};
+
 export async function POST(request: NextRequest) {
   let browser;
-  let page: Page | undefined;
   let cardDetails;
   
   try {
+    console.log('Starting purchase request...');
     const session = await auth()
     if (!session?.user?.id) {
+      console.error('Authentication failed: No user session');
       return NextResponse.json(
         { error: 'User must be logged in' },
         { status: 401 }
       )
     }
 
-    const { productHandle, cardDetails: requestCardDetails } = await request.json()
+    console.log('Parsing request body...');
+    const { productHandle, cardDetails: requestCardDetails, purchaseFlow = 'test-checkout' } = await request.json()
     cardDetails = requestCardDetails;
     
+    console.log('Validating request parameters...');
     if (!productHandle || !cardDetails) {
+      console.error('Validation failed:', {
+        hasProductHandle: !!productHandle,
+        hasCardDetails: !!cardDetails
+      });
       return NextResponse.json(
         { error: 'Product handle and card details are required' },
         { status: 400 }
       )
     }
 
+    if (!Object.keys(purchaseFlows).includes(purchaseFlow)) {
+      console.error('Invalid purchase flow:', purchaseFlow);
+      return NextResponse.json(
+        { error: `Invalid purchase flow. Must be one of: ${Object.keys(purchaseFlows).join(', ')}` },
+        { status: 400 }
+      )
+    }
+
     // Validate card details
+    console.log('Validating card details...');
+    console.log('Card details received:', {
+      hasNumber: !!cardDetails.number,
+      hasExpiry: !!cardDetails.expiry,
+      hasCvc: !!cardDetails.cvc,
+      hasCardId: !!cardDetails.cardId,
+      hasCardHolderId: !!cardDetails.cardHolderId,
+      email: cardDetails.email,
+      firstName: !!cardDetails.firstName,
+      lastName: !!cardDetails.lastName
+    });
+
     if (!cardDetails.number || !cardDetails.expiry || !cardDetails.cvc || !cardDetails.cardId) {
+      console.error('Card details validation failed');
       return NextResponse.json(
         { error: 'Invalid card details provided', details: { 
           hasNumber: !!cardDetails.number,
@@ -49,166 +85,104 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('Starting purchase automation for product:', productHandle);
+    // Fetch shipping address
+    console.log('Fetching shipping address...');
+    const shippingAddressResponse = await fetch(`${request.nextUrl.origin}/api/shipping-address`, {
+      headers: {
+        'Cookie': request.headers.get('cookie') || '',
+      }
+    });
+
+    if (!shippingAddressResponse.ok) {
+      return NextResponse.json(
+        { error: 'Failed to fetch shipping address' },
+        { status: 500 }
+      );
+    }
+
+    const shippingAddress = await shippingAddressResponse.json();
+
+    // Update card details with shipping address
+    cardDetails = {
+      ...cardDetails,
+      email: cardDetails.email || session.user.email,
+      address: {
+        line1: shippingAddress.addressLine1,
+        line2: shippingAddress.addressLine2,
+        city: shippingAddress.city,
+        state: shippingAddress.state,
+        postal_code: shippingAddress.postalCode,
+        country: shippingAddress.country
+      }
+    };
+
+    console.log(`Starting purchase automation for product: ${productHandle} using flow: ${purchaseFlow}`);
 
     // Initialize Browserbase
+    console.log('Initializing Browserbase...');
     const bb = new Browserbase({
       apiKey: process.env.BROWSERBASE_API_KEY,
     });
 
     // Create a new session
+    console.log('Creating Browserbase session...');
     const bbSession = await bb.sessions.create({
       projectId: process.env.BROWSERBASE_PROJECT_ID!,
     });
 
     // Connect to the session
+    console.log('Connecting to browser session...');
     browser = await chromium.connectOverCDP(bbSession.connectUrl);
 
     // Get default context and page
+    console.log('Getting browser context and page...');
     const context = browser.contexts()[0];
-    page = context?.pages()[0];
+    const page = context?.pages()[0];
 
     if (!page) {
+      console.error('No default page available');
       throw new Error('No default page available');
     }
 
-    try {
-      console.log('Navigating to product page...');
-      await page.goto(`${APP_CONFIG.product.productUrl}${productHandle}`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000
-      });
+    console.log('Starting purchase flow execution...');
+    const executePurchase = purchaseFlows[purchaseFlow as PurchaseFlow];
+    const result = await executePurchase(page, {
+      productHandle,
+      cardDetails
+    });
 
-      // Handle popup if present
-      console.log('Waiting for and checking popup...');
-      try {
-        await page.waitForTimeout(5000);
-        await page.getByRole('button', { name: 'Close dialog' }).click();
-        await page.waitForTimeout(2000);
-        console.log('Popup closed successfully');
-      } catch (e) {
-        console.log('No popup found, continuing...');
-      }
-
-      console.log('Selecting one-time purchase...');
-      await page.getByText('One-Time Purchase$').click();
-      await page.waitForTimeout(1000);
-
-      console.log('Adding to cart and proceeding to checkout...');
-      await page.getByRole('button', { name: 'Add to Cart' }).click();
-      await page.waitForTimeout(2000);
-      await page.getByRole('button', { name: 'Checkout' }).click();
-      await page.waitForTimeout(2000);
-
-      console.log('Filling shipping information...');
-      await page.getByRole('textbox', { name: 'Email' }).fill(cardDetails.email);
-      await page.getByRole('textbox', { name: 'First name (optional)' }).fill(cardDetails.firstName);
-      await page.getByRole('textbox', { name: 'Last name' }).fill(cardDetails.lastName);
-      await page.getByRole('combobox', { name: 'Address' }).fill(cardDetails.address.line1);
-      await page.getByRole('textbox', { name: 'City' }).fill(cardDetails.address.city);
-      await page.getByLabel('State').selectOption(cardDetails.address.state);
-      await page.getByRole('textbox', { name: 'ZIP code' }).fill(cardDetails.address.postal_code);
-
-      await page.getByRole('button', { name: 'Continue to shipping' }).click();
-      await page.waitForTimeout(2000);
-      await page.getByRole('button', { name: 'Continue to payment' }).click();
-      await page.waitForTimeout(2000);
-
-      console.log('Filling card details...');
-      await page.waitForTimeout(2000);
-
-      try {
-        const cardNumberFrame = await page.frameLocator('iframe[name*="card-fields-number"]').first();
-        await cardNumberFrame.getByRole('textbox', { name: 'Card number' }).fill(cardDetails.number);
-        
-        const expiryFrame = await page.frameLocator('iframe[name*="card-fields-expiry"]').first();
-        await expiryFrame.getByRole('textbox', { name: 'Expiration date (MM / YY)' }).fill(cardDetails.expiry);
-        
-        const cvcFrame = await page.frameLocator('iframe[name*="card-fields-verification_value"]').first();
-        await cvcFrame.getByRole('textbox', { name: 'Security code' }).fill(cardDetails.cvc);
-        
-        const nameFrame = await page.frameLocator('iframe[name*="card-fields-name"]').first();
-        await nameFrame.getByRole('textbox', { name: 'Name on card' }).fill(`${cardDetails.firstName} ${cardDetails.lastName}`);
-      } catch (error) {
-        throw new Error(`Failed to fill card details: ${error instanceof Error ? error.message : 'Unknown error'}`)
-      }
-
-      console.log('Completing purchase...');
-      await page.getByRole('button', { name: 'Pay now' }).click();
-
-      try {
-        await page.waitForSelector('h1:has-text("Thank you"), h1:has-text("Order confirmed")', { timeout: 8000 });
-      } catch (error) {
-        // Check for error messages on the page
-        const errorText = await page.evaluate(() => {
-          const errorElements = document.querySelectorAll('[class*="error"], [class*="Error"], .alert-danger');
-          return Array.from(errorElements).map(el => el.textContent).join(' ');
-        });
-        throw new Error(`Purchase failed. Errors found: ${errorText || 'No specific error message found'}`);
-      }
-
-      const orderNumber = await page.$eval(
-        '[data-test="order-number"], .order-number, .confirmation-number',
-        (el: HTMLElement) => el.textContent?.trim() || ''
-      );
-
-      const total = await page.$eval(
-        '[data-test="order-total"], .order-total, .total-amount',
-        (el: HTMLElement) => el.textContent?.trim() || ''
-      );
-
-      console.log('Purchase completed successfully!');
-
-      return NextResponse.json({
-        success: true,
-        orderDetails: {
-          orderNumber,
-          total
-        }
-      });
-    } catch (error) {
-      console.error('Error during automated purchase:', error);
+    if (!result.success) {
+      console.error('Purchase execution failed:', result.error, result.details);
       return NextResponse.json(
         { 
           success: false,
-          error: 'Failed to complete automated purchase',
-          details: error instanceof Error ? error.message : 'Unknown error'
+          error: result.error,
+          details: result.details,
+          cardId: cardDetails?.cardId
         },
         { status: 500 }
       );
     }
+
+    return NextResponse.json({
+      success: true,
+      orderDetails: result.orderDetails,
+      cardId: cardDetails?.cardId
+    });
+
   } catch (error) {
     console.error('Error in request handling:', error);
     return NextResponse.json(
       { 
         success: false,
         error: 'Failed to complete automated purchase',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
+        cardId: cardDetails?.cardId
       },
       { status: 500 }
     );
   } finally {
-    // Deactivate the virtual card regardless of purchase outcome
-    if (cardDetails?.cardId) {
-      try {
-        const deactivateResponse = await fetch(`${request.nextUrl.origin}/api/stripe/deactivate-card`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ cardId: cardDetails.cardId })
-        });
-
-        if (!deactivateResponse.ok) {
-          console.error('Failed to deactivate card:', await deactivateResponse.text());
-        } else {
-          console.log('Successfully deactivated card:', cardDetails.cardId);
-        }
-      } catch (error) {
-        console.error('Error deactivating card:', error);
-      }
-    }
-
+    // First close the browser
     if (browser) {
       try {
         console.log('Closing browser...');

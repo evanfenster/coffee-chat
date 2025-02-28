@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     // Deactivate the card
     const card = await stripe.issuing.cards.update(cardId, {
-      status: 'inactive'
+      status: 'canceled'
     })
 
     return NextResponse.json({
