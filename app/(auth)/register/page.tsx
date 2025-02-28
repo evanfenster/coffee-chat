@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { AuthForm } from '@/components/auth-form';
 import { SubmitButton } from '@/components/submit-button';
+import { TermsModal } from '@/components/terms-modal';
 
 import { register, type RegisterActionState } from '../actions';
 
@@ -53,16 +54,29 @@ export default function Page() {
         </div>
         <AuthForm action={handleSubmit} defaultEmail={email}>
           <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
-          <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {'Already have an account? '}
-            <Link
-              href="/login"
-              className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
-            >
-              Sign in
-            </Link>
-            {' instead.'}
-          </p>
+          <div className="text-center text-sm text-gray-600 mt-4 space-y-2 dark:text-zinc-400">
+            <p>
+              {'Already have an account? '}
+              <Link
+                href="/login"
+                className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
+              >
+                Sign in
+              </Link>
+              {' instead.'}
+            </p>
+            <p>
+              By signing up, you agree to our{' '}
+              <TermsModal
+                trigger={
+                  <button className="font-semibold text-gray-800 hover:underline dark:text-zinc-200">
+                    Terms of Service
+                  </button>
+                }
+              />
+              .
+            </p>
+          </div>
         </AuthForm>
       </div>
     </div>
