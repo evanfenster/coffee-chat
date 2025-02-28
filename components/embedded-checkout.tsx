@@ -36,26 +36,6 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
   const [status, setStatus] = useState<'initial' | 'processing' | 'complete' | 'error' | 'success'>('initial')
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error', message: string, description: string } | null>(null)
 
-  // Function to deactivate card
-  const deactivateCard = async (cardId: string) => {
-    try {
-      console.log('Deactivating virtual card...', cardId);
-      const deactivateResponse = await fetch('/api/stripe/deactivate-card', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cardId })
-      });
-
-      if (!deactivateResponse.ok) {
-        console.error('Failed to deactivate card');
-      } else {
-        console.log('Successfully deactivated card');
-      }
-    } catch (deactivateError) {
-      console.error('Error deactivating card:', deactivateError);
-    }
-  };
-
   // Handle toast notifications
   useEffect(() => {
     if (toastMessage) {
@@ -316,12 +296,6 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                   
                   const result = await response.json();
                   console.log('Process order result:', result);
-
-                  // Always deactivate card if we have one
-                  if (result.cardId) {
-                    console.log('Deactivating card:', result.cardId);
-                    await deactivateCard(result.cardId);
-                  }
 
                   if (!response.ok) {
                     throw new Error(result.error || 'Failed to process order');
