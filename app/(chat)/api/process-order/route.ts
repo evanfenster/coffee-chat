@@ -129,6 +129,7 @@ export async function POST(request: NextRequest) {
           productHandle: product.handle,
           cardDetails: {
             ...cardDetails,
+            cardHolderId: cardDetails.cardHolderId,
             address: {
               line1: shippingAddress.addressLine1,
               line2: shippingAddress.addressLine2,

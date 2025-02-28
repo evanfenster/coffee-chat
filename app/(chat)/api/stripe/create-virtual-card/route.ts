@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
       cardId: card.id,
       cardDetails: {
         cardId: card.id,
+        cardHolderId: userData.stripeCardHolderId,
         number: cardDetails.number,
         expiry: `${card.exp_month}/${card.exp_year.toString().slice(-2)}`,
         cvc: cardDetails.cvc,
