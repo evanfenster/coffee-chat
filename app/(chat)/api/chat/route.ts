@@ -31,6 +31,8 @@ import { createClearCoffeeFiltersTool } from '@/lib/ai/tools/clear-coffee-filter
 import { createGetKnowledgeTool } from '@/lib/ai/tools/get-knowledge';
 
 export const maxDuration = 60;
+const MAX_INPUT_CHARS = 500; // Maximum characters allowed in input
+const MAX_RESPONSE_CHARS = 2000; // Maximum characters allowed in response
 
 export async function POST(request: Request) {
   try {
@@ -56,6 +58,12 @@ export async function POST(request: Request) {
     if (!userMessage) {
       console.log('🔴 [route] No user message found');
       return new Response('No user message found', { status: 400 });
+    }
+
+    // Validate message length
+    if (typeof userMessage.content === 'string' && userMessage.content.length > MAX_INPUT_CHARS) {
+      console.log('🔴 [route] Message too long');
+      return new Response('Message too long', { status: 400 });
     }
 
     const chat = await getChatById({ id });
@@ -113,6 +121,19 @@ export async function POST(request: Request) {
                   messages: response.messages,
                   reasoning,
                 });
+
+                // Validate response length
+                const totalResponseLength = sanitizedResponseMessages.reduce((acc, msg) => {
+                  if (typeof msg.content === 'string') {
+                    return acc + msg.content.length;
+                  }
+                  return acc;
+                }, 0);
+
+                if (totalResponseLength > MAX_RESPONSE_CHARS) {
+                  console.log('🔴 [route] Response too long');
+                  throw new Error('Response too long');
+                }
 
                 await saveMessages({
                   messages: sanitizedResponseMessages.map((message) => {

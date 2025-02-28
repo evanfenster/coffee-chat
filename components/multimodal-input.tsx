@@ -22,6 +22,7 @@ import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
 import { sanitizeUIMessages } from '@/lib/utils';
+import { APP_CONFIG } from '@/config/app.config';
 
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
@@ -29,6 +30,7 @@ import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { SuggestedActions } from './suggested-actions';
 import equal from 'fast-deep-equal';
+import { cn } from '@/lib/utils';
 
 function PureMultimodalInput({
   chatId,
@@ -109,9 +111,17 @@ function PureMultimodalInput({
     setLocalStorageInput(input);
   }, [input, setLocalStorageInput]);
 
-  const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(event.target.value);
-    adjustHeight();
+  const [isOverLimit, setIsOverLimit] = useState(false);
+
+  useEffect(() => {
+    setIsOverLimit(input.length > APP_CONFIG.limits.message.maxInputChars);
+  }, [input]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    if (newValue.length <= APP_CONFIG.limits.message.maxInputChars) {
+      setInput(newValue);
+    }
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -234,7 +244,7 @@ function PureMultimodalInput({
         ref={textareaRef}
         placeholder="Send a message..."
         value={input}
-        onChange={handleInput}
+        onChange={handleInputChange}
         className={cx(
           'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
           className,
@@ -252,7 +262,14 @@ function PureMultimodalInput({
             }
           }
         }}
+        maxLength={APP_CONFIG.limits.message.maxInputChars}
       />
+
+      {input.length > 0 && (
+        <div className="absolute bottom-2 right-14 text-xs text-muted-foreground">
+          {input.length}/{APP_CONFIG.limits.message.maxInputChars}
+        </div>
+      )}
 
       <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
         <AttachmentsButton fileInputRef={fileInputRef} isLoading={isLoading} />
