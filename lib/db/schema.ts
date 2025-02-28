@@ -195,3 +195,11 @@ export const order = pgTable('Order', {
 });
 
 export type Order = InferSelectModel<typeof order>;
+
+export const systemSettings = pgTable('SystemSettings', {
+  key: varchar('key', { length: 255 }).primaryKey().notNull(),
+  value: json('value').notNull(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+});
+
+export type SystemSettings = InferSelectModel<typeof systemSettings>;

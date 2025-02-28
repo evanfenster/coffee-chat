@@ -2,19 +2,24 @@ import { createHash } from 'crypto';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { db } from './db/queries';
-import { knowledgeResource, knowledgeEmbedding } from './db/schema';
+import { knowledgeResource, knowledgeEmbedding, systemSettings } from './db/schema';
 import { generateEmbeddings } from './ai/embedding';
 import { eq, not, inArray } from 'drizzle-orm';
 
-let isInitialized = false;
-
 export async function initializeKnowledgeBase() {
-  // Only run once per server instance
-  if (isInitialized) {
-    return;
-  }
-
   try {
+    // Check if knowledge base has already been initialized
+    const settings = await db
+      .select()
+      .from(systemSettings)
+      .where(eq(systemSettings.key, 'knowledge_base_initialized'))
+      .limit(1);
+
+    // Only return if we have the flag AND it's set to true
+    if (settings.length > 0 && settings[0].value === true) {
+      return;
+    }
+
     console.log('Initializing knowledge base...');
     
     const KNOWLEDGE_DIR = join(process.cwd(), 'knowledge');
@@ -112,8 +117,22 @@ export async function initializeKnowledgeBase() {
       }
     }
     
+    // Mark knowledge base as initialized
+    await db
+      .insert(systemSettings)
+      .values({
+        key: 'knowledge_base_initialized',
+        value: true,
+      })
+      .onConflictDoUpdate({
+        target: systemSettings.key,
+        set: {
+          value: true,
+          updatedAt: new Date(),
+        },
+      });
+    
     console.log('Knowledge base initialization complete');
-    isInitialized = true;
   } catch (error) {
     console.error('Error initializing knowledge base:', error);
     throw error;
