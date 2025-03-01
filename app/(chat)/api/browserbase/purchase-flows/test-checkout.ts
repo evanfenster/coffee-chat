@@ -59,20 +59,26 @@ export async function executeTestCheckoutPurchase(
     console.log(JSON.stringify(purchaseDetails.cardDetails.address, null, 2));
     console.log('------------------------------');
     
-    if (purchaseDetails.cardDetails.billingAddress) {
-      console.log('Billing Address:');
-      console.log(JSON.stringify(purchaseDetails.cardDetails.billingAddress, null, 2));
-      console.log('------------------------------');
-      
-      console.log('Addresses Match?', 
-        addressesMatch(
-          purchaseDetails.cardDetails.address, 
-          purchaseDetails.cardDetails.billingAddress as Address
-        ) ? 'YES' : 'NO'
-      );
-    } else {
-      console.log('No Billing Address Provided');
+
+    console.log('Billing Address:');
+    // billing address details are within the cardDetails object as line1, line2, city, state, postal_code, country
+    // create the billing address object
+    const billingAddress = {
+      line1: purchaseDetails.cardDetails.address.line1,
+      line2: purchaseDetails.cardDetails.address.line2,
+      city: purchaseDetails.cardDetails.address.city,
+      state: purchaseDetails.cardDetails.address.state,
+      postal_code: purchaseDetails.cardDetails.address.postal_code,
+      country: purchaseDetails.cardDetails.address.country
     }
+    console.log('------------------------------');
+    
+    console.log('Addresses Match?', 
+    addressesMatch(
+        purchaseDetails.cardDetails.address, 
+        billingAddress
+    ) ? 'YES' : 'NO'
+    );
     console.log('------------------------------');
 
     // Return success without executing the actual checkout
