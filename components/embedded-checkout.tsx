@@ -34,26 +34,6 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [status, setStatus] = useState<'initial' | 'processing' | 'complete' | 'error' | 'success'>('initial')
-  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error', message: string, description: string } | null>(null)
-
-  // Handle toast notifications
-  useEffect(() => {
-    if (toastMessage) {
-      if (toastMessage.type === 'success') {
-        toast.success(toastMessage.message, {
-          description: toastMessage.description,
-          duration: 10000, // 10 seconds
-        });
-      } else {
-        toast.error(toastMessage.message, {
-          description: toastMessage.description,
-          duration: 10000, // 10 seconds
-        });
-      }
-      
-      // Remove the automatic dialog closing since we're now closing it immediately after processing
-    }
-  }, [toastMessage, onClose]);
 
   useEffect(() => {
     const fetchClientSecret = async () => {
@@ -296,26 +276,29 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                     throw new Error(result.error || 'Failed to process order');
                   }
 
-                  // Set success status and show toast, but don't wait for the toast to close
+                  // Set success status and show toast directly
                   setStatus('success');
-                  setToastMessage({
-                    type: 'success',
-                    message: 'Order Complete!',
-                    description: 'Your order has been successfully placed. Check your email for confirmation.'
+                  // Call toast directly instead of using state
+                  toast.success('Order Complete!', {
+                    description: 'Your order has been successfully placed. Check your email for confirmation.',
+                    duration: 10000, // 10 seconds
                   });
 
                 } catch (error) {
                   console.error('Error processing order:', error);
-                  // Set error status and show toast, but don't wait for the toast to close
+                  // Set error status and show toast directly
                   setStatus('error');
-                  setToastMessage({
-                    type: 'error',
-                    message: 'Order Failed',
-                    description: 'We encountered an error and have refunded your payment. Please try again.'
+                  // Call toast directly instead of using state
+                  toast.error('Order Failed', {
+                    description: 'We encountered an error and have refunded your payment. Please try again.',
+                    duration: 10000, // 10 seconds
                   });
                 } finally {
-                  // Close the checkout dialog immediately after processing, regardless of success or failure
-                  onClose();
+                  // Add a small delay before closing to ensure toast appears
+                  setTimeout(() => {
+                    // Close the checkout dialog after a short delay
+                    onClose();
+                  }, 100);
                 }
               },
             }}
