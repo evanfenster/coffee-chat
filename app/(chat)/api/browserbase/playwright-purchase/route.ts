@@ -4,6 +4,7 @@ import { auth } from '@/app/(auth)/auth';
 import BrowserbaseSDK from "@browserbasehq/sdk";
 import { executeTradeCoffeePurchase } from '../purchase-flows/trade-coffee';
 import { executeTestCheckoutPurchase } from '../purchase-flows/test-checkout';
+import { executeTestStripeCheckout } from '../purchase-flows/test-stripe-checkout';
 
 if (!process.env.BROWSERBASE_API_KEY) {
   throw new Error('BROWSERBASE_API_KEY is required');
@@ -13,11 +14,12 @@ if (!process.env.BROWSERBASE_PROJECT_ID) {
   throw new Error('BROWSERBASE_PROJECT_ID is required');
 }
 
-type PurchaseFlow = 'trade-coffee' | 'test-checkout';
+type PurchaseFlow = 'trade-coffee' | 'test-checkout' | 'test-stripe-checkout';
 
 const purchaseFlows = {
   'trade-coffee': executeTradeCoffeePurchase,
   'test-checkout': executeTestCheckoutPurchase,
+  'test-stripe-checkout': executeTestStripeCheckout,
 };
 
 export async function POST(request: NextRequest) {
@@ -36,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Parsing request body...');
-    const { productHandle, cardDetails: requestCardDetails, purchaseFlow = 'test-checkout' } = await request.json()
+    const { productHandle, cardDetails: requestCardDetails, purchaseFlow = 'trade-coffee' } = await request.json()
     cardDetails = requestCardDetails;
     
     console.log('Validating request parameters...');
