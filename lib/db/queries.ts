@@ -5,6 +5,7 @@ import { and, asc, desc, eq, gt, gte, inArray } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
+import { APP_CONFIG } from '@/config/app.config';
 import {
   user,
   chat,
@@ -39,14 +40,56 @@ export async function getUser(email: string): Promise<Array<User>> {
   }
 }
 
-export async function createUser(email: string, password: string) {
+export async function createUser(
+  email: string, 
+  password: string, 
+  firstName: string, 
+  lastName: string
+) {
   const salt = genSaltSync(10);
   const hash = hashSync(password, salt);
 
   try {
-    return await db.insert(user).values({ email, password: hash });
+    // Make API call to stoa-api to create user there first
+    const { agentId } = APP_CONFIG.stoa.api;
+    const stoaApiUrl = `${APP_CONFIG.stoa.api.baseUrl}/users/`;
+    
+    const response = await fetch(stoaApiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.STOA_API_KEY}`
+      },
+      body: JSON.stringify({
+        agentId,
+        firstName,
+        lastName,
+        email,
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Failed to create user in stoa-api:', errorText);
+      throw new Error(`Failed to create user in stoa-api: ${errorText}`);
+    }
+    
+    // Only create user in our database if stoa-api call succeeds
+    const responseData = await response.json();
+    
+    // Handle the case where responseData is an array (from returning())
+    const stoaUser = Array.isArray(responseData) ? responseData[0] : responseData;
+    console.log('Stoa user:', stoaUser);
+    
+    return await db.insert(user).values({ 
+      email, 
+      password: hash, 
+      stoaId: stoaUser.id, // Use stoaUser instead of responseData
+      firstName,
+      lastName
+    });
   } catch (error) {
-    console.error('Failed to create user in database');
+    console.error('Failed to create user:', error);
     throw error;
   }
 }

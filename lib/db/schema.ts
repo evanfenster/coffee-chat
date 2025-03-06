@@ -17,14 +17,9 @@ export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   email: varchar('email', { length: 64 }).notNull(),
   password: varchar('password', { length: 64 }),
-  stripeCardHolderId: varchar('stripe_cardholder_id', { length: 255 }),
-  stripeCustomerId: varchar('stripe_customer_id', { length: 255 }),
-  addressLine1: varchar('address_line1', { length: 255 }),
-  addressLine2: varchar('address_line2', { length: 255 }),
-  city: varchar('city', { length: 100 }),
-  state: varchar('state', { length: 100 }),
-  postalCode: varchar('postal_code', { length: 20 }),
-  country: varchar('country', { length: 100 }),
+  stoaId: varchar('stoaId', { length: 64 }),
+  firstName: varchar('firstName', { length: 64 }),
+  lastName: varchar('lastName', { length: 64 }),
 });
 
 export type User = InferSelectModel<typeof user>;

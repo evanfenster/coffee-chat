@@ -7,8 +7,9 @@ import {
 } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { Coffee, X, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
 import { calculateFinalPrice } from '@/lib/utils/pricing'
+import { APP_CONFIG } from '@/config/app.config'
+import { processOrderWithStoa } from '@/app/actions/stoa'
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error(
@@ -250,53 +251,30 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                 console.log('Stripe checkout completed, sessionId:', sessionId);
 
                 try {
-                  console.log('Processing order...');
-                  const response = await fetch('/api/process-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                      sessionId,
-                      product
-                    }),
+                  console.log('Processing order with Stoa API...');
+                  
+                  const result = await processOrderWithStoa(sessionId, {
+                    handle: product.handle,
+                    name: product.name,
+                    price: product.price
                   });
-
-                  console.log('Process order response status:', response.status);
                   
-                  // Check if response is JSON before parsing
-                  const contentType = response.headers.get('content-type');
-                  if (!contentType || !contentType.includes('application/json')) {
-                    console.error('Non-JSON response received:', await response.text());
-                    throw new Error('Server returned non-JSON response');
+                  console.log('Order processing result:', result);
+                  
+                  if (!result.success) {
+                    throw new Error(`Order processing error: ${result.error}`);
                   }
                   
-                  const result = await response.json();
-                  console.log('Process order result:', result);
-
-                  if (!response.ok) {
-                    throw new Error(result.error || 'Failed to process order');
-                  }
-
-                  // Set success status and show toast directly
+                  // Set success status without toast notification
                   setStatus('success');
-                  // Call toast directly instead of using state
-                  toast.success('Order Complete!', {
-                    description: 'Your order has been successfully placed. Check your email for confirmation.',
-                    duration: 10000, // 10 seconds
-                  });
-
+                  
                 } catch (error) {
                   console.error('Error processing order:', error);
-                  // Set error status and show toast directly
+                  // Set error status without toast notification
                   setStatus('error');
-                  // Call toast directly instead of using state
-                  toast.error('Order Failed', {
-                    description: 'We encountered an error and have refunded your payment. Please try again.',
-                    duration: 10000, // 10 seconds
-                  });
                 } finally {
-                  // Add a small delay before closing to ensure toast appears
+                  // Close the checkout dialog after processing is complete
                   setTimeout(() => {
-                    // Close the checkout dialog after a short delay
                     onClose();
                   }, 100);
                 }

@@ -7,15 +7,60 @@ export function AuthForm({
   action,
   children,
   defaultEmail = '',
+  showNameFields = false,
 }: {
   action: NonNullable<
     string | ((formData: FormData) => void | Promise<void>) | undefined
   >;
   children: React.ReactNode;
   defaultEmail?: string;
+  showNameFields?: boolean;
 }) {
   return (
     <Form action={action} className="flex flex-col gap-4 px-4 sm:px-16">
+      {showNameFields && (
+        <>
+          <div className="flex flex-col gap-2">
+            <Label
+              htmlFor="firstName"
+              className="text-zinc-600 font-normal dark:text-zinc-400"
+            >
+              First Name
+            </Label>
+
+            <Input
+              id="firstName"
+              name="firstName"
+              className="bg-muted text-md md:text-sm"
+              type="text"
+              placeholder="John"
+              autoComplete="given-name"
+              required
+              autoFocus
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label
+              htmlFor="lastName"
+              className="text-zinc-600 font-normal dark:text-zinc-400"
+            >
+              Last Name
+            </Label>
+
+            <Input
+              id="lastName"
+              name="lastName"
+              className="bg-muted text-md md:text-sm"
+              type="text"
+              placeholder="Doe"
+              autoComplete="family-name"
+              required
+            />
+          </div>
+        </>
+      )}
+
       <div className="flex flex-col gap-2">
         <Label
           htmlFor="email"
@@ -32,7 +77,7 @@ export function AuthForm({
           placeholder="user@acme.com"
           autoComplete="email"
           required
-          autoFocus
+          autoFocus={!showNameFields}
           defaultValue={defaultEmail}
         />
       </div>

@@ -5,6 +5,12 @@ export const APP_CONFIG = {
     description: 'Interactive chatbot that helps you find and purchase new coffee beans.',
     icon: '☕'
   },
+  stoa: {
+    api: {
+      baseUrl: 'https://stoa-api.vercel.app/api',
+      agentId: 'c6dfd1ed-be54-444f-80f4-8fe899beeff0',
+    }
+  },
   welcome: {
     title: 'Welcome to Barista Agent',
     tagline: "Let's find your next favorite coffee.",
