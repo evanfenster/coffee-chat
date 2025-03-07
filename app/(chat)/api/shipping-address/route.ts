@@ -4,6 +4,7 @@ import { db } from "@/lib/db/queries";
 import { user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { APP_CONFIG } from "@/config/app.config";
 
 // Schema for validating shipping address data
 const shippingAddressSchema = z.object({
@@ -22,22 +23,51 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Get the user's stoaId
     const userData = await db.select({
-      addressLine1: user.addressLine1,
-      addressLine2: user.addressLine2,
-      city: user.city,
-      state: user.state,
-      postalCode: user.postalCode,
-      country: user.country,
+      stoaId: user.stoaId,
     }).from(user)
       .where(eq(user.id, session.user.id))
       .execute();
 
-    if (!userData || userData.length === 0) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!userData || userData.length === 0 || !userData[0].stoaId) {
+      return NextResponse.json({ error: "User not found or missing Stoa ID" }, { status: 404 });
     }
 
-    return NextResponse.json(userData[0]);
+    const stoaId = userData[0].stoaId;
+
+    // Call Stoa API to get the user's shipping address
+    const stoaApiUrl = `${APP_CONFIG.stoa.api.baseUrl}/users?userId=${stoaId}`;
+    const response = await fetch(stoaApiUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${process.env.STOA_API_KEY}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Stoa API error:", errorData);
+      return NextResponse.json(
+        { error: "Failed to fetch shipping address from Stoa", details: errorData },
+        { status: response.status }
+      );
+    }
+
+    const stoaUserData = await response.json();
+    const stoaUser = stoaUserData[0];
+    
+    // Map Stoa's schema to our schema
+    const shippingAddress = {
+      addressLine1: stoaUser.line1 || "",
+      addressLine2: stoaUser.line2 || null,
+      city: stoaUser.city || "",
+      state: stoaUser.state || "",
+      postalCode: stoaUser.zip || "",
+      country: stoaUser.country || "",
+    };
+
+    return NextResponse.json(shippingAddress);
   } catch (error) {
     console.error("Error fetching shipping address:", error);
     return NextResponse.json(
@@ -54,13 +84,61 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Get the user's stoaId
+    const userData = await db.select({
+      stoaId: user.stoaId,
+    }).from(user)
+      .where(eq(user.id, session.user.id))
+      .execute();
+
+    if (!userData || userData.length === 0 || !userData[0].stoaId) {
+      return NextResponse.json({ error: "User not found or missing Stoa ID" }, { status: 404 });
+    }
+
+    const stoaId = userData[0].stoaId;
     const body = await request.json();
     const validatedData = shippingAddressSchema.parse(body);
 
-    await db.update(user)
-      .set(validatedData)
-      .where(eq(user.id, session.user.id))
-      .execute();
+    // Map our schema to Stoa's schema
+    const stoaAddressData = {
+      line1: validatedData.addressLine1,
+      line2: validatedData.addressLine2 || "",
+      city: validatedData.city,
+      state: validatedData.state,
+      zip: validatedData.postalCode,
+      country: validatedData.country,
+    };
+
+    // Call Stoa API to update the user
+    const stoaApiUrl = `${APP_CONFIG.stoa.api.baseUrl}/users`;
+    
+    console.log("Calling Stoa API:", stoaApiUrl, "with data:", {
+      agentId: APP_CONFIG.stoa.api.agentId,
+      userId: stoaId,
+      ...stoaAddressData
+    });
+    
+    const response = await fetch(stoaApiUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.STOA_API_KEY}`
+      },
+      body: JSON.stringify({
+        agentId: APP_CONFIG.stoa.api.agentId,
+        userId: stoaId,
+        ...stoaAddressData
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Stoa API error:", errorData);
+      return NextResponse.json(
+        { error: "Failed to update shipping address in Stoa", details: errorData },
+        { status: response.status }
+      );
+    }
 
     return NextResponse.json({ message: "Shipping address updated successfully" });
   } catch (error) {

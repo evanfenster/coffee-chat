@@ -1,6 +1,7 @@
 'use server';
 
 import { APP_CONFIG } from '@/config/app.config';
+import { getStoaUserId } from '@/lib/db/queries';
 
 type ProductInfo = {
   handle: string;
@@ -8,11 +9,17 @@ type ProductInfo = {
   price: string;
 };
 
-export async function processOrderWithStoa(sessionId: string, product: ProductInfo) {
+export async function processOrderWithStoa(
+  userId: string, 
+  product: ProductInfo, 
+  sessionId: string,
+  webhookUrl?: string
+) {
   try {
-    const agentId = APP_CONFIG.stoa.api.agentId;
-    const stoaOrderUrl = `${APP_CONFIG.stoa.api.baseUrl}/purchase-request/`;
-    const userId = sessionId;
+
+    const stoaUserId = await getStoaUserId(userId);
+
+    const stoaOrderUrl = `${APP_CONFIG.stoa.api.baseUrl}/purchase-requests/`;
     
     const response = await fetch(stoaOrderUrl, {
       method: 'POST',
@@ -21,20 +28,15 @@ export async function processOrderWithStoa(sessionId: string, product: ProductIn
         'Authorization': `Bearer ${process.env.STOA_API_KEY}`
       },
       body: JSON.stringify({
-        userId,
-        shippingAddress: {
-          name: 'John Doe',
-          address1: '123 Main St',
-          city: 'Anytown',
-          state: 'CA',
-          zip: '12345'
-        },
+        userId: stoaUserId,
         info: {
             script: 'trade-coffee',
             productHandle: product.handle,
             productName: product.name,
             price: product.price,
-        }
+        },
+        sessionId: sessionId,
+        webhookUrl: webhookUrl,
       }),
     });
     
@@ -53,20 +55,21 @@ export async function processOrderWithStoa(sessionId: string, product: ProductIn
     if (!response.ok) {
       return { 
         success: false, 
-        error: responseData.message || 'Failed to process order with Stoa',
+        error: responseData.error || responseData.message || 'Failed to process order with Stoa',
         status: response.status
       };
     }
     
     return { 
       success: true, 
-      data: responseData 
+      purchaseRequest: responseData.purchaseRequest || responseData,
+      message: responseData.message || 'Purchase request created successfully'
     };
   } catch (error) {
     console.error('Error processing order with Stoa:', error);
     return { 
       success: false, 
-      error: 'Internal server error processing the order'
+      error: error instanceof Error ? error.message : 'Internal server error processing the order'
     };
   }
 } 

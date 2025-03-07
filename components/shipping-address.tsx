@@ -67,6 +67,7 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
         throw new Error('Failed to fetch address')
       }
       const data = await response.json()
+      console.log('Fetched address:', data);
       setCurrentAddress(data)
       // Reset form with current values
       reset({
@@ -111,6 +112,8 @@ export default function ShippingAddress({ onComplete }: ShippingAddressProps) {
 
       const responseData = await response.json().catch(() => ({ error: 'Failed to parse response' }));
       
+      console.log('Response data:', responseData);
+
       if (!response.ok) {
         throw new Error(responseData.error || 'Failed to update address');
       }

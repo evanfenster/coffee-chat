@@ -40,6 +40,20 @@ export async function getUser(email: string): Promise<Array<User>> {
   }
 }
 
+export async function getStoaUserId(userId: string): Promise<string> {
+  try {
+    const [result] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, userId));
+
+    return result?.stoaId || '';
+  } catch (error) {
+    console.error('Failed to get stoa user id from database');
+    throw error;
+  }
+}
+
 export async function createUser(
   email: string, 
   password: string, 

@@ -54,16 +54,15 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'payment',
-      ...(userData.stripeCustomerId 
-        ? { customer: userData.stripeCustomerId }
-        : { customer_creation: 'always' }
-      ),
       metadata: {
         userId: session.user.id
       }
     })
 
-    return NextResponse.json({ clientSecret: checkoutSession.client_secret })
+    return NextResponse.json({ 
+      userId: session.user.id,
+      clientSecret: checkoutSession.client_secret
+    })
   } catch (error) {
     console.error('Stripe error:', error)
     return NextResponse.json(

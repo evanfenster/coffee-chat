@@ -33,6 +33,7 @@ interface EmbeddedCheckoutProps {
 
 export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [status, setStatus] = useState<'initial' | 'processing' | 'complete' | 'error' | 'success'>('initial')
 
@@ -57,6 +58,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
         }
 
         setClientSecret(data.clientSecret)
+        setUserId(data.userId)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to create checkout session'
         console.error('Checkout error:', message)
@@ -251,13 +253,17 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                 console.log('Stripe checkout completed, sessionId:', sessionId);
 
                 try {
-                  console.log('Processing order with Stoa API...');
-                  
-                  const result = await processOrderWithStoa(sessionId, {
+                  if (!userId) {
+                    throw new Error('User ID is not available');
+                  }
+                  const result = await processOrderWithStoa(userId, {
                     handle: product.handle,
                     name: product.name,
                     price: product.price
-                  });
+                  },
+                  sessionId,
+                  undefined // webhookUrl is optional
+                );
                   
                   console.log('Order processing result:', result);
                   

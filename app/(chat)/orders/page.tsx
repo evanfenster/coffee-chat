@@ -1,6 +1,5 @@
 import ShippingAddress from '@/components/shipping-address';
 import OrderHistory from '@/components/order-history';
-import { SidebarToggle } from '@/components/sidebar-toggle';
 import { OrdersHeader } from '@/components/orders-header';
 
 export default function OrdersPage() {
