@@ -82,11 +82,11 @@ export default function OrderHistory() {
       
       {isLoading ? (
         <div className="flex justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Loader2 className="size-8 animate-spin text-muted-foreground" />
         </div>
       ) : orders.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
-          <p>You haven't placed any orders yet.</p>
+          <p>You haven&apos;t placed any orders yet.</p>
         </div>
       ) : (
         <div className="rounded-md border">
