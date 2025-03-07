@@ -6,9 +6,8 @@ import {
   EmbeddedCheckoutProvider,
 } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { Coffee, X, Loader2 } from 'lucide-react'
+import { Coffee, X } from 'lucide-react'
 import { calculateFinalPrice } from '@/lib/utils/pricing'
-import { APP_CONFIG } from '@/config/app.config'
 import { processOrderWithStoa } from '@/app/actions/stoa'
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
@@ -259,7 +258,7 @@ export function EmbeddedCheckoutDialog({ product, onClose }: EmbeddedCheckoutPro
                   const result = await processOrderWithStoa(userId, {
                     handle: product.handle,
                     name: product.name,
-                    price: product.price
+                    price: calculateFinalPrice(parseFloat(product.price)).toString()
                   },
                   sessionId,
                   undefined // webhookUrl is optional
