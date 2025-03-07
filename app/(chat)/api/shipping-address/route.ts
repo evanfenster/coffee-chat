@@ -37,12 +37,12 @@ export async function GET() {
     const stoaId = userData[0].stoaId;
 
     // Call Stoa API to get the user's shipping address
-    const stoaApiUrl = `${APP_CONFIG.stoa.api.baseUrl}/users?userId=${stoaId}`;
+    const stoaApiUrl = `${APP_CONFIG.stoa.api.baseUrl}/users/${stoaId}?agentId=${APP_CONFIG.stoa.api.agentId}`;
     const response = await fetch(stoaApiUrl, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${process.env.STOA_API_KEY}`
-      }
+      },
     });
 
     if (!response.ok) {
@@ -55,7 +55,7 @@ export async function GET() {
     }
 
     const stoaUserData = await response.json();
-    const stoaUser = stoaUserData[0];
+    const stoaUser = stoaUserData;
     
     // Map Stoa's schema to our schema
     const shippingAddress = {
@@ -110,11 +110,10 @@ export async function PUT(request: Request) {
     };
 
     // Call Stoa API to update the user
-    const stoaApiUrl = `${APP_CONFIG.stoa.api.baseUrl}/users`;
+    const stoaApiUrl = `${APP_CONFIG.stoa.api.baseUrl}/users/${stoaId}`;
     
     console.log("Calling Stoa API:", stoaApiUrl, "with data:", {
       agentId: APP_CONFIG.stoa.api.agentId,
-      userId: stoaId,
       ...stoaAddressData
     });
     
@@ -126,7 +125,6 @@ export async function PUT(request: Request) {
       },
       body: JSON.stringify({
         agentId: APP_CONFIG.stoa.api.agentId,
-        userId: stoaId,
         ...stoaAddressData
       }),
     });

@@ -7,7 +7,7 @@ export const APP_CONFIG = {
   },
   stoa: {
     api: {
-      baseUrl: 'https://stoa-api.vercel.app/api',
+      baseUrl: 'https://stoa-express-api-production.up.railway.app/api',
       agentId: 'c6dfd1ed-be54-444f-80f4-8fe899beeff0',
     }
   },
