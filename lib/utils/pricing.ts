@@ -7,7 +7,7 @@ export function calculateFinalPrice(basePrice: number): number {
   // Constants for fee calculations
   const STRIPE_PERCENTAGE = 0.029; // 2.9%
   const STRIPE_FIXED_FEE = 0.30; // $0.30
-  const PLATFORM_PERCENTAGE = 0.10; // 10% platform fee
+  const PLATFORM_PERCENTAGE = 0.05; // 5% platform fee
   const SHIPPING_FEE = 1.95; // Standard shipping fee
   const FREE_SHIPPING_THRESHOLD = 30; // Free shipping for orders over $30
   
