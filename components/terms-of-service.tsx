@@ -35,7 +35,7 @@ export function TermsOfService() {
       <ul>
         <li>Barista Agent is acting as your agent in the ordering, purchasing, and arranging delivery of goods purchased by you;</li>
         <li>The retailer—not Barista Agent—is the seller of the goods to you;</li>
-        <li>Title to any goods passes to you when they are purchased from the applicable retailer's store or website;</li>
+        <li>Title to any goods passes to you when they are purchased from the applicable retailer&apos;s store or website;</li>
         <li>Barista Agent will obtain an authorization for your payment method on file with Stripe to cover the cost of the goods purchased from the retailer on your behalf, plus any applicable fees, taxes, and/or shipping costs;</li>
         <li>Your payment method will be charged for the goods purchased by Barista Agent on your behalf and any applicable fees, taxes, and/or shipping costs.</li>
       </ul>
@@ -46,7 +46,7 @@ export function TermsOfService() {
       </p>
       <ul>
         <li>Communicating with retailers regarding order status, shipping delays, or product quality issues;</li>
-        <li>Facilitating returns or exchanges according to the retailer's policies;</li>
+        <li>Facilitating returns or exchanges according to the retailer&apos;s policies;</li>
         <li>Providing order tracking information when available.</li>
       </ul>
       
@@ -54,8 +54,8 @@ export function TermsOfService() {
         However, you understand that as we are purchasing products on your behalf from third-party retailers:
       </p>
       <ul>
-        <li>All purchases are subject to the retailer's terms, conditions, and return policies;</li>
-        <li>We cannot guarantee acceptance of returns or exchanges beyond what the retailer's policies allow;</li>
+        <li>All purchases are subject to the retailer&apos;s terms, conditions, and return policies;</li>
+        <li>We cannot guarantee acceptance of returns or exchanges beyond what the retailer&apos;s policies allow;</li>
         <li>In the event of product defects or shipping damage, we will work as your agent to seek appropriate remedies from the retailer.</li>
       </ul>
 
